@@ -1,0 +1,13 @@
+Actual startup excerpts; no credentials included.
+JPA bootstrap profile:
+2026-11-04T16:09:24.876+07:00  INFO 13972 --- [A3PhanTuanThanh_SE1910] [           main] f.e.a.A3PhanTuanThanhSe1910Application   : The following 1 profile is active: "bootstrap"
+2026-11-04T16:09:28.278+07:00  INFO 13972 --- [A3PhanTuanThanh_SE1910] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T16:09:30.826+07:00  INFO 13972 --- [A3PhanTuanThanh_SE1910] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T16:09:31.809+07:00  INFO 13972 --- [A3PhanTuanThanh_SE1910] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-11-04T16:09:31.830+07:00  INFO 13972 --- [A3PhanTuanThanh_SE1910] [           main] f.e.a.A3PhanTuanThanhSe1910Application   : Started A3PhanTuanThanhSe1910Application in 7.618 seconds (process running for 8.409)
+Normal validate profile on 8081:
+2026-11-04T16:14:56.531+07:00  INFO 20456 --- [A3PhanTuanThanh_SE1910] [           main] f.e.a.A3PhanTuanThanhSe1910Application   : No active profile set, falling back to 1 default profile: "default"
+2026-11-04T16:15:00.127+07:00  INFO 20456 --- [A3PhanTuanThanh_SE1910] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-04T16:15:03.044+07:00  INFO 20456 --- [A3PhanTuanThanh_SE1910] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-04T16:15:05.017+07:00  INFO 20456 --- [A3PhanTuanThanh_SE1910] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-11-04T16:15:05.047+07:00  INFO 20456 --- [A3PhanTuanThanh_SE1910] [           main] f.e.a.A3PhanTuanThanhSe1910Application   : Started A3PhanTuanThanhSe1910Application in 9.176 seconds (process running for 9.939)

@@ -1,0 +1,5 @@
+Verified at: 2026-11-04T16:18:19.7319043+07:00
+PASS: public GET /api/rooms returned 3 rooms without credentials.
+PASS: public GET /api/room-types returned 2 room types without credentials.
+PASS: frontend /api proxy returned the same SQL Server room and room-type data.
+PASS: frontend entry page returned HTTP 200 with the assignment project title.

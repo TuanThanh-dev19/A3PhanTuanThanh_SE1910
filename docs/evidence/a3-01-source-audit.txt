@@ -1,0 +1,8 @@
+Pre-commit source review on 2026-11-04 (Asia/Bangkok).
+PASS: created/modified source and configuration files have the required author header where comments are supported.
+PASS: JSON parses without comments; original generated Maven wrappers were left unchanged.
+PASS: no exact local database password, private-key block, common GitHub/AWS token or JWT pattern found in candidate text files.
+PASS: local configuration, target, node_modules and dist are ignored.
+PASS: exactly seven Markdown files exist directly under docs, and evidence/.gitkeep exists.
+PASS: all relative Markdown links in README/docs resolve to existing files.
+Scope: source inspection and pattern/exact-value checks, not a guarantee against every possible secret format.

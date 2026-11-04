@@ -1,0 +1,44 @@
+Command: postman collection run postman/a3-01-bootstrap.postman_collection.json --reporters cli
+Local file run; no Postman sign-in or cloud publication.
+
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+A3-01 - Project and database bootstrap
+
+Root Public room catalog
+
+  GET http://127.0.0.1:8081/api/rooms [200 OK, 771 B, 58 ms]
+  Pass  HTTP 200 without authentication
+  Pass  Three seeded rooms
+  Pass  Room type relationship and money value
+  Pass  No password fields in room DTOs
+
+Root Public room types
+
+  GET http://127.0.0.1:8081/api/room-types [200 OK, 449 B, 14 ms]
+  Pass  HTTP 200 without authentication
+  Pass  Both seeded room types
+
+----------------------------------------------------------------------
+|                         |            executed |             failed |
+--------------------------+---------------------+---------------------
+|              iterations |                   1 |                  0 |
+--------------------------+---------------------+---------------------
+|                requests |                   2 |                  0 |
+--------------------------+---------------------+---------------------
+|            test-scripts |                   2 |                  0 |
+--------------------------+---------------------+---------------------
+|      prerequest-scripts |                   0 |                  0 |
+--------------------------+---------------------+---------------------
+|              assertions |                   6 |                  0 |
+----------------------------------------------------------------------
+| total run duration: 280 ms                                         |
+----------------------------------------------------------------------
+| total data received: 892 B (approx)                                |
+----------------------------------------------------------------------
+| average response time: 36 ms [min: 14 ms, max: 58 ms, s.d.: 22 ms] |
+----------------------------------------------------------------------

@@ -1,0 +1,16 @@
+Command: npm run build --prefix frontend/A3PhanTuanThanh_SE1910
+
+
+> a3phantuanthanh_se1910@0.0.1 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 75 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.55 kB │ gzip:  0.35 kB
+dist/assets/index-DpS4E5B8.css    1.11 kB │ gzip:  0.59 kB
+dist/assets/index-N2MfmQB0.js   279.73 kB │ gzip: 90.47 kB
+
+✓ built in 316ms

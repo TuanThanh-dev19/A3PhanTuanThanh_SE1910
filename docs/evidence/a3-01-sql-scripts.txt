@@ -1,0 +1,7 @@
+Command: sqlcmd -S .\SQL2022 -E -C -b -i <isolated script-check file>
+Source: database/02-original-schema.sql, 03-a3-migration.sql and 04-seed.sql.
+The source scripts were copied to a temporary file with only the database name changed for isolation.
+Actual output excerpts:
+PASS: original-derived schema creates all five tables and preserves the original customer identity seed.
+PASS: migration and seed run twice; two room types, three rooms, password length 255, sequence and four NO ACTION foreign keys.
+PASS: isolated script-check database removed after successful verification.

@@ -1,0 +1,19 @@
+/* Author: Phan Tuan Thanh - CE190595 */
+:root { font-family: Arial, sans-serif; color: #17313b; background: #f3f6f5; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1120px; margin: auto; padding: 56px 28px; }
+header { border-bottom: 1px solid #d1dcd8; padding-bottom: 30px; margin-bottom: 30px; }
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.15; margin: 12px 0; }
+h2, h3 { margin: 0; }
+.eyebrow { color: #276955; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.catalog-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 18px; }
+article { background: white; padding: 28px; border: 1px solid #d1dcd8; border-radius: 12px; }
+article h3 { font-size: 1.5rem; }
+.price { font-size: 1.3rem; font-weight: 700; margin-top: 24px; }
+.price span { font-size: 0.85rem; font-weight: 400; }
+.status { display: inline-block; background: #e7f3ec; color: #246047; padding: 3px 12px; border-radius: 20px; font-size: 0.8rem; }
+.error { color: #962f25; background: #fff0ee; padding: 16px; }
+footer { margin-top: 36px; color: #536e75; font-size: 0.85rem; }
+@media (max-width: 600px) { main { padding: 28px 18px; } }

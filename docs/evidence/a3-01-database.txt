@@ -1,0 +1,26 @@
+Changed database context to 'A3PhanTuanThanh_SE1910'.
+DatabaseName
+------------
+A3PhanTuanThanh_SE1910
+MappedTable
+-----------
+BookingDetail
+BookingReservation
+Customer
+RoomInformation
+RoomType
+BookingSequence increment
+--------------- ---------
+BookingReservationSequence 1
+PasswordColumnLength
+--------------------
+255
+ForeignKeyName DeleteRule
+-------------- ----------
+FK_BookingDetail_BookingReservation NO_ACTION
+FK_BookingDetail_RoomInformation NO_ACTION
+FK_BookingReservation_Customer NO_ACTION
+FK_RoomInformation_RoomType NO_ACTION
+RoomTypeCount RoomCount CustomerCountAfterRollback BookingCountAfterRollback DetailCountAfterRollback
+------------- --------- -------------------------- ------------------------- ------------------------
+2 3 0 0 0

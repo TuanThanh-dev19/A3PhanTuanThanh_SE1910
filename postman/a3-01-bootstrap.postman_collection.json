@@ -1,0 +1,61 @@
+{
+  "info": {
+    "name": "A3-01 - Project and database bootstrap",
+    "description": "Author: Phan Tuan Thanh - CE190595. Read-only checks against the local SQL Server-backed API. No credentials or tokens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8081"
+    }
+  ],
+  "item": [
+    {
+      "name": "Public room catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/rooms"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('HTTP 200 without authentication', () => pm.response.to.have.status(200));",
+              "const rooms = pm.response.json();",
+              "pm.test('Three seeded rooms', () => pm.expect(rooms.map(room => room.roomNumber)).to.include.members(['101', '102', '201']));",
+              "pm.test('Room type relationship and money value', () => { const room = rooms.find(room => room.roomNumber === '101'); pm.expect(room.roomTypeName).to.eql('Standard'); pm.expect(room.roomPricePerDay).to.eql(500000); });",
+              "pm.test('No password fields in room DTOs', () => rooms.forEach(room => pm.expect(room).not.to.have.property('password')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public room types",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/room-types"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('HTTP 200 without authentication', () => pm.response.to.have.status(200));",
+              "const types = pm.response.json();",
+              "pm.test('Both seeded room types', () => pm.expect(types.map(type => type.roomTypeName)).to.include.members(['Standard', 'Deluxe']));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

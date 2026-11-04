@@ -1,0 +1,304 @@
+Actual local Postman CLI output. No credentials/tokens retained.
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+A3-04 - Booking workflows
+
+Root Public rooms
+
+  GET http://127.0.0.1:8081/api/rooms [200 OK, 941 B, 284 ms]
+  Pass  Public rooms: HTTP 200
+  Pass  Seeded room catalog
+
+Root Register customer
+
+  POST http://127.0.0.1:8081/api/auth/register [201 Created, 526 B, 227 ms]
+  Pass  Register customer: HTTP 201
+  Pass  Safe customer DTO
+
+Root Duplicate email
+
+  POST http://127.0.0.1:8081/api/auth/register [409 Conflict, 391 B, 20 ms]
+  Pass  Duplicate email: HTTP 409
+
+Root Wrong password
+
+  POST http://127.0.0.1:8081/api/auth/login [401 Unauthorized, 384 B, 75 ms]
+  Pass  Wrong password: HTTP 401
+
+Root Customer login
+
+  POST http://127.0.0.1:8081/api/auth/login [200 OK, 584 B, 104 ms]
+  Pass  Customer login: HTTP 200
+  Pass  Customer role
+
+Root Own profile
+
+  GET http://127.0.0.1:8081/api/profile [200 OK, 521 B, 24 ms]
+  Pass  Own profile: HTTP 200
+  Pass  Own customer identity
+
+Root Update profile
+
+  PUT http://127.0.0.1:8081/api/profile [200 OK, 529 B, 34 ms]
+  Pass  Update profile: HTTP 200
+
+Root Missing token
+
+  GET http://127.0.0.1:8081/api/profile [401 Unauthorized, 377 B, 4 ms]
+  Pass  Missing token: HTTP 401
+
+Root Invalid token
+
+  GET http://127.0.0.1:8081/api/profile [401 Unauthorized, 407 B, 6 ms]
+  Pass  Invalid token: HTTP 401
+
+Root Customer denied staff access
+
+  GET http://127.0.0.1:8081/api/staff/customers [403 Forbidden, 397 B, 5 ms]
+  Pass  Customer denied staff access: HTTP 403
+
+Root Staff login
+
+  POST http://127.0.0.1:8081/api/auth/login [200 OK, 570 B, 66 ms]
+  Pass  Staff login: HTTP 200
+  Pass  Staff role
+
+Root Staff denied customer profile
+
+  GET http://127.0.0.1:8081/api/profile [403 Forbidden, 397 B, 4 ms]
+  Pass  Staff denied customer profile: HTTP 403
+
+Root Invalid registration
+
+  POST http://127.0.0.1:8081/api/auth/register [400 Bad Request, 538 B, 33 ms]
+  Pass  Invalid registration: HTTP 400
+
+Root Room type options
+
+  GET http://127.0.0.1:8081/api/room-types [200 OK, 619 B, 12 ms]
+  Pass  Room type options: HTTP 200
+
+Root Create room
+
+  POST http://127.0.0.1:8081/api/staff/rooms [201 Created, 524 B, 44 ms]
+  Pass  Create room: HTTP 201
+
+Root Search room
+
+  GET http://127.0.0.1:8081/api/staff/rooms?search=PM-1793785985428 [200 OK, 526 B, 22 ms]
+  Pass  Search room: HTTP 200
+  Pass  One matching room
+
+Root Update room
+
+  PUT http://127.0.0.1:8081/api/staff/rooms/21 [200 OK, 519 B, 29 ms]
+  Pass  Update room: HTTP 200
+  Pass  Updated price
+
+Root Duplicate room number
+
+  POST http://127.0.0.1:8081/api/staff/rooms [409 Conflict, 389 B, 9 ms]
+  Pass  Duplicate room number: HTTP 409
+
+Root Invalid room
+
+  POST http://127.0.0.1:8081/api/staff/rooms [400 Bad Request, 553 B, 7 ms]
+  Pass  Invalid room: HTTP 400
+
+Root Delete unused room
+
+  DELETE http://127.0.0.1:8081/api/staff/rooms/21 [200 OK, 361 B, 33 ms]
+  Pass  Delete unused room: HTTP 200
+
+Root Deleted room is missing
+
+  GET http://127.0.0.1:8081/api/staff/rooms/21 [404 Not Found, 370 B, 9 ms]
+  Pass  Deleted room is missing: HTTP 404
+
+Root Create customer
+
+  POST http://127.0.0.1:8081/api/staff/customers [201 Created, 530 B, 76 ms]
+  Pass  Create customer: HTTP 201
+
+Root Search customer
+
+  GET http://127.0.0.1:8081/api/staff/customers?search=a3managed-1793785983416@example.test [200 OK, 527 B, 12 ms]
+  Pass  Search customer: HTTP 200
+  Pass  One matching customer
+
+Root Update customer
+
+  PUT http://127.0.0.1:8081/api/staff/customers/55 [200 OK, 525 B, 13 ms]
+  Pass  Update customer: HTTP 200
+
+Root Delete unused customer
+
+  DELETE http://127.0.0.1:8081/api/staff/customers/55 [204 No Content, 282 B, 16 ms]
+  Pass  Delete unused customer: HTTP 204
+
+Root Customer is missing
+
+  GET http://127.0.0.1:8081/api/staff/customers/55 [404 Not Found, 374 B, 8 ms]
+  Pass  Customer is missing: HTTP 404
+
+Root Create bookingRoom1
+
+  POST http://127.0.0.1:8081/api/staff/rooms [201 Created, 552 B, 12 ms]
+  Pass  Create bookingRoom1: HTTP 201
+
+Root Create bookingRoom2
+
+  POST http://127.0.0.1:8081/api/staff/rooms [201 Created, 552 B, 11 ms]
+  Pass  Create bookingRoom2: HTTP 201
+
+Root One-room booking
+
+  POST http://127.0.0.1:8081/api/bookings [201 Created, 724 B, 75 ms]
+  Pass  One-room booking: HTTP 201
+  Pass  Server total overrides client input
+
+Root Multi-room booking
+
+  POST http://127.0.0.1:8081/api/bookings [201 Created, 884 B, 30 ms]
+  Pass  Multi-room booking: HTTP 201
+  Pass  Two details and server total
+
+Root Overlapping dates
+
+  POST http://127.0.0.1:8081/api/bookings [409 Conflict, 425 B, 11 ms]
+  Pass  Overlapping dates: HTTP 409
+
+Root Duplicate room details
+
+  POST http://127.0.0.1:8081/api/bookings [400 Bad Request, 369 B, 8 ms]
+  Pass  Duplicate room details: HTTP 400
+
+Root Invalid dates
+
+  POST http://127.0.0.1:8081/api/bookings [400 Bad Request, 425 B, 8 ms]
+  Pass  Invalid dates: HTTP 400
+
+Root Missing room rollback
+
+  POST http://127.0.0.1:8081/api/bookings [404 Not Found, 381 B, 11 ms]
+  Pass  Missing room rollback: HTTP 404
+
+Root Own history
+
+  GET http://127.0.0.1:8081/api/bookings [200 OK, 1.24 KB, 21 ms]
+  Pass  Own history: HTTP 200
+  Pass  Own history has created booking
+
+Root Register other customer
+
+  POST http://127.0.0.1:8081/api/auth/register [201 Created, 528 B, 80 ms]
+  Pass  Register other customer: HTTP 201
+
+Root Other customer login
+
+  POST http://127.0.0.1:8081/api/auth/login [200 OK, 590 B, 77 ms]
+  Pass  Other customer login: HTTP 200
+
+Root Other customer cannot read booking
+
+  GET http://127.0.0.1:8081/api/bookings/24 [404 Not Found, 373 B, 12 ms]
+  Pass  Other customer cannot read booking: HTTP 404
+
+Root Staff reservation search
+
+  GET http://127.0.0.1:8081/api/staff/bookings?search=a3pm-c9c34aa7-9485-45cd-a@example.test [200 OK, 1.24 KB, 28 ms]
+  Pass  Staff reservation search: HTTP 200
+  Pass  Staff sees both customer bookings
+
+Root Staff edits details
+
+  PUT http://127.0.0.1:8081/api/staff/bookings/24 [200 OK, 879 B, 35 ms]
+  Pass  Staff edits details: HTTP 200
+  Pass  Updated details and total
+
+Root Cancel booking preserves details
+
+  DELETE http://127.0.0.1:8081/api/staff/bookings/24 [200 OK, 879 B, 20 ms]
+  Pass  Cancel booking preserves details: HTTP 200
+  Pass  Cancelled with history
+
+Root Cancelled booking releases dates
+
+  POST http://127.0.0.1:8081/api/bookings [201 Created, 718 B, 20 ms]
+  Pass  Cancelled booking releases dates: HTTP 201
+
+Root Conflicting reactivation rejected
+
+  PATCH http://127.0.0.1:8081/api/staff/bookings/24/status [409 Conflict, 425 B, 17 ms]
+  Pass  Conflicting reactivation rejected: HTTP 409
+
+Root Referenced customer protected
+
+  DELETE http://127.0.0.1:8081/api/staff/customers/54 [409 Conflict, 420 B, 12 ms]
+  Pass  Referenced customer protected: HTTP 409
+
+Root Referenced room deactivated
+
+  DELETE http://127.0.0.1:8081/api/staff/rooms/23 [200 OK, 396 B, 15 ms]
+  Pass  Referenced room deactivated: HTTP 200
+  Pass  History-safe room result
+
+Root Inactive room booking rejected
+
+  POST http://127.0.0.1:8081/api/bookings [409 Conflict, 403 B, 9 ms]
+  Pass  Inactive room booking rejected: HTTP 409
+
+Root History still accessible
+
+  GET http://127.0.0.1:8081/api/bookings/25 [200 OK, 879 B, 13 ms]
+  Pass  History still accessible: HTTP 200
+  Pass  Details preserved
+
+Root Cancel multi booking
+
+  DELETE http://127.0.0.1:8081/api/staff/bookings/25 [200 OK, 879 B, 19 ms]
+  Pass  Cancel multi booking: HTTP 200
+
+Root Cancel replacement booking
+
+  DELETE http://127.0.0.1:8081/api/staff/bookings/26 [200 OK, 713 B, 20 ms]
+  Pass  Cancel replacement booking: HTTP 200
+
+Root Staff offline booking
+
+  POST http://127.0.0.1:8081/api/staff/bookings [201 Created, 724 B, 16 ms]
+  Pass  Staff offline booking: HTTP 201
+
+Root Cancel offline fixture
+
+  DELETE http://127.0.0.1:8081/api/staff/bookings/27 [200 OK, 719 B, 16 ms]
+  Pass  Cancel offline fixture: HTTP 200
+
+Root Deactivate fixture room
+
+  DELETE http://127.0.0.1:8081/api/staff/rooms/22 [200 OK, 396 B, 10 ms]
+  Pass  Deactivate fixture room: HTTP 200
+
+----------------------------------------------------------------------
+|                         |            executed |             failed |
+--------------------------+---------------------+---------------------
+|              iterations |                   1 |                  0 |
+--------------------------+---------------------+---------------------
+|                requests |                  52 |                  0 |
+--------------------------+---------------------+---------------------
+|            test-scripts |                  52 |                  0 |
+--------------------------+---------------------+---------------------
+|      prerequest-scripts |                  52 |                  0 |
+--------------------------+---------------------+---------------------
+|              assertions |                  68 |                  0 |
+----------------------------------------------------------------------
+| total run duration: 6 s                                            |
+----------------------------------------------------------------------
+| total data received: 11.78 KB (approx)                             |
+----------------------------------------------------------------------
+| average response time: 34 ms [min: 4 ms, max: 284 ms, s.d.: 50 ms] |
+----------------------------------------------------------------------

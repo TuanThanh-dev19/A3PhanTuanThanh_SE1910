@@ -29,10 +29,10 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A03-02 | Guest/Customer | Attempt staff APIs | Denied | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
 | A03-03 | Staff | Delete unused room versus previously booked room | Hard delete unused room; status change for referenced room | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
 | A03-04 | Staff | Delete customer with history, invalid field values | Preserve history and reject invalid data | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
-| A04-01 | Customer | Create one-room and multi-room booking | One transaction, correct server total and unique ID | Booking API not implemented | NOT RUN | - |
-| A04-02 | Customer | Missing room, inactive room, invalid dates and overlap | Clear rejection without partial booking | Not implemented | NOT RUN | - |
-| A04-03 | Customer | Own history versus another customer's booking | Own records only | Not implemented | NOT RUN | - |
-| A04-04 | Staff | Manage reservations/details with valid and invalid edits | Safe updates and preserved history | Not implemented | NOT RUN | - |
+| A04-01 | Customer | Create one-room and multi-room booking | One transaction, correct server total and unique ID | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
+| A04-02 | Customer | Missing room, inactive room, invalid dates and overlap | Clear rejection without partial booking | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
+| A04-03 | Customer | Own history versus another customer's booking | Own records only | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
+| A04-04 | Staff | Manage reservations/details with valid and invalid edits | Safe updates and preserved history | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
 | A05-01 | Staff | React login, guarded routes, CRUD/search/details, refresh | Real API workflow and clear errors | Not implemented | NOT RUN | - |
 | A06-01 | Customer | Register -> login -> profile -> select rooms -> booking -> history -> logout | Real end-to-end workflow; staff sees new booking | Not implemented | NOT RUN | - |
 | A07-01 | All | Full Postman/React regression and permissions | All final requirements verified | Only A3-01 subset executed | NOT RUN | - |
@@ -50,3 +50,9 @@ Backend: [actual Maven result](evidence/a3-02-backend-build.txt). API: [actual P
 Staff customer/room CRUD and search, room-type lookup, referenced-room deactivation and customer-history protection.
 
 Backend: [actual Maven result](evidence/a3-03-backend-build.txt). API: [actual Postman result](evidence/a3-03-postman.txt). Source: [author/credential checks](evidence/a3-03-source-audit.txt).
+
+## A3-04 verification
+
+Transactional multi-room bookings, ownership, availability/date checks, server totals and staff reservation/detail management.
+
+Backend: [actual Maven result](evidence/a3-04-backend-build.txt). API: [actual Postman result](evidence/a3-04-postman.txt). Source: [author/credential checks](evidence/a3-04-source-audit.txt).

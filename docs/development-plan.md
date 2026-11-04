@@ -8,8 +8,8 @@ Branch: `feature/a3-hotel`. Remote: `https://github.com/TuanThanh-dev19/A3PhanTu
 | --- | --- | --- | --- | --- |
 | A3-01 | Spring Boot 3/SQL Server + React/Axios, five entities/composite key, A3 SQL/migration/seed, safe local config, seven docs; actual backend/SQL queries and frontend startup verified | DONE | 2026-11-04 | `8742d60d8c3689105bcd1c1061396d8f9e996fa5` (remote verified) |
 | A3-02 | JWT customer registration/login, configured staff login, BCrypt, role security, public rooms, own profile; Postman success/failure/role checks | DONE | 2026-11-04 | `b8101dee76767187a9f5e7532382ed9f350ac407` (pushed/verified) |
-| A3-03 | Staff customer/room CRUD/search, room types, protect booking history on deletion; Postman CRUD/validation/authorization | DONE | 2026-11-04 | SHA recorded in the next stage/follow-up commit |
-| A3-04 | Transactional one/many-room bookings, unique IDs, server totals, overlap/date/status checks, own history, staff reservations/details; Postman valid/invalid/ownership checks | TODO | - | - |
+| A3-03 | Staff customer/room CRUD/search, room types, protect booking history on deletion; Postman CRUD/validation/authorization | DONE | 2026-11-04 | `379be0ae5e395e69d0bdf7579f90353c37d84d70` (pushed/verified) |
+| A3-04 | Transactional one/many-room bookings, unique IDs, server totals, overlap/date/status checks, own history, staff reservations/details; Postman valid/invalid/ownership checks | DONE | 2026-11-04 | SHA recorded in the next stage/follow-up commit |
 | A3-05 | React public/auth/staff screens, Axios JWT and guards, real CRUD/search/details and session behavior; staff UI/API verification | TODO | - | - |
 | A3-06 | Customer profile, room selection, multi-room booking, history/logout; register-to-history end-to-end with staff visibility | TODO | - | - |
 | A3-07 | Postman regression, FE/BE/permissions/history preservation, builds, README/docs consistency, secret review and clean tree | TODO | - | - |

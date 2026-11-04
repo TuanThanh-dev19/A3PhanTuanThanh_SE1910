@@ -1,0 +1,1545 @@
+{
+  "info": {
+    "name": "A3-04 - Booking workflows",
+    "description": "Author: Phan Tuan Thanh - CE190595. Local requests; credentials and tokens exist only in runtime variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8081"
+    },
+    {
+      "key": "invalidToken",
+      "value": "invalid.token.value"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Author: Phan Tuan Thanh - CE190595",
+          "if (!pm.collectionVariables.get('customerEmail')) { const id = pm.variables.replaceIn('{{$guid}}'); pm.collectionVariables.set('customerEmail', 'a3pm-' + id.slice(0,20) + '@example.test'); pm.collectionVariables.set('customerPassword', 'Customer!' + id); pm.collectionVariables.set('wrongPassword', 'Wrong!' + id); }",
+          "if (!pm.collectionVariables.get('managedEmail')) pm.collectionVariables.set('managedEmail', 'a3managed-' + Date.now() + '@example.test');",
+          "if (!pm.collectionVariables.get('stayStart')) { const date = new Date(); date.setUTCDate(date.getUTCDate()+30); pm.collectionVariables.set('stayStart',date.toISOString().slice(0,10)); date.setUTCDate(date.getUTCDate()+2); pm.collectionVariables.set('stayEnd',date.toISOString().slice(0,10)); date.setUTCDate(date.getUTCDate()+2); pm.collectionVariables.set('laterEnd',date.toISOString().slice(0,10)); pm.collectionVariables.set('otherEmail','a3other-'+Date.now()+'@example.test'); }"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Public rooms",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/rooms"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Public rooms: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Seeded room catalog', () => pm.expect(pm.response.json().length).to.be.at.least(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Register customer: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('customerId', pm.response.json().customerId);",
+              "pm.test('Safe customer DTO', () => pm.expect(pm.response.json()).not.to.have.property('password'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Duplicate email: HTTP 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{customerEmail}}\", \"password\": \"{{wrongPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Wrong password: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{customerEmail}}\", \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Customer login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('customerToken', pm.response.json().token);",
+              "pm.test('Customer role', () => pm.expect(pm.response.json().role).to.eql('CUSTOMER'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Own profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Own profile: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Own customer identity', () => pm.expect(pm.response.json().customerId).to.eql(Number(pm.collectionVariables.get('customerId'))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customerFullName\": \"Updated Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Update profile: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Missing token: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid token",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{invalidToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid token: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer denied staff access",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Customer denied staff access: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{staffEmail}}\", \"password\": \"{{staffPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('staffToken', pm.response.json().token);",
+              "pm.test('Staff role', () => pm.expect(pm.response.json().role).to.eql('STAFF'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff denied customer profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff denied customer profile: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"bad\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2999-01-01\"}, \"password\": \"short\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid registration: HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Room type options",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/room-types"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Room type options: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('typeId', pm.response.json()[0].roomTypeId);",
+              "pm.collectionVariables.set('roomNumber', 'PM-' + Date.now());"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create room",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"roomNumber\": \"{{roomNumber}}\", \"roomDetailDescription\": \"Postman room\", \"roomMaxCapacity\": 2, \"roomTypeId\": \"{{typeId}}\", \"roomStatus\": 1, \"roomPricePerDay\": 650000}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Create room: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('roomId', pm.response.json().roomId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search room",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms?search={{roomNumber}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Search room: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('One matching room',()=>pm.expect(pm.response.json().length).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update room",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms/{{roomId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"roomNumber\": \"{{roomNumber}}\", \"roomDetailDescription\": \"Postman room\", \"roomMaxCapacity\": 2, \"roomTypeId\": \"{{typeId}}\", \"roomStatus\": 1, \"roomPricePerDay\": 700000}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Update room: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Updated price',()=>pm.expect(pm.response.json().roomPricePerDay).to.eql(700000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Duplicate room number",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"roomNumber\": \"{{roomNumber}}\", \"roomDetailDescription\": \"Postman room\", \"roomMaxCapacity\": 2, \"roomTypeId\": \"{{typeId}}\", \"roomStatus\": 1, \"roomPricePerDay\": 650000}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Duplicate room number: HTTP 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid room",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid room: HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete unused room",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms/{{roomId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Delete unused room: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Deleted room is missing",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms/{{roomId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Deleted room is missing: HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Staff-created Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{managedEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"customerStatus\": 1, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Create customer: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('managedId',pm.response.json().customerId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search customer",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers?search={{managedEmail}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Search customer: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('One matching customer',()=>pm.expect(pm.response.json().length).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update customer",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers/{{managedId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Staff-created Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{managedEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"customerStatus\": 2}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Update customer: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete unused customer",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers/{{managedId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Delete unused customer: HTTP 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer is missing",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers/{{managedId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Customer is missing: HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create bookingRoom1",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"roomNumber\": \"B-bookingRoom1-{{roomNumber}}\", \"roomDetailDescription\": \"Booking verification room\", \"roomTypeId\": \"{{typeId}}\", \"roomMaxCapacity\": 2, \"roomStatus\": 1, \"roomPricePerDay\": 500000}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Create bookingRoom1: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('bookingRoom1',pm.response.json().roomId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create bookingRoom2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"roomNumber\": \"B-bookingRoom2-{{roomNumber}}\", \"roomDetailDescription\": \"Booking verification room\", \"roomTypeId\": \"{{typeId}}\", \"roomMaxCapacity\": 2, \"roomStatus\": 1, \"roomPricePerDay\": 550000}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Create bookingRoom2: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('bookingRoom2',pm.response.json().roomId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "One-room booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}], \"totalPrice\": 1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('One-room booking: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('oneBooking',pm.response.json().bookingReservationId);",
+              "pm.test('Server total overrides client input',()=>pm.expect(pm.response.json().totalPrice).to.eql(1000000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Multi-room booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayEnd}}\", \"endDate\": \"{{laterEnd}}\"}, {\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayEnd}}\", \"endDate\": \"{{laterEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Multi-room booking: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('multiBooking',pm.response.json().bookingReservationId);",
+              "pm.test('Two details and server total',()=>{pm.expect(pm.response.json().details.length).to.eql(2);pm.expect(pm.response.json().totalPrice).to.eql(2100000);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Overlapping dates",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Overlapping dates: HTTP 409',()=>pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Duplicate room details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}, {\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Duplicate room details: HTTP 400',()=>pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid dates",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayEnd}}\", \"endDate\": \"{{stayStart}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid dates: HTTP 400',()=>pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing room rollback",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}, {\"roomId\": 2147483647, \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Missing room rollback: HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Own history",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Own history: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Own history has created booking',()=>pm.expect(pm.response.json().map(b=>b.bookingReservationId)).to.include(Number(pm.collectionVariables.get('multiBooking'))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register other customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Other Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{otherEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Register other customer: HTTP 201',()=>pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Other customer login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{otherEmail}}\", \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Other customer login: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('otherToken',pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Other customer cannot read booking",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{otherToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings/{{oneBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Other customer cannot read booking: HTTP 404',()=>pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff reservation search",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings?search={{customerEmail}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff reservation search: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Staff sees both customer bookings',()=>pm.expect(pm.response.json().length).to.eql(2));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff edits details",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{oneBooking}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customerId\": \"{{customerId}}\", \"bookingStatus\": 1, \"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}, {\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff edits details: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Updated details and total',()=>{pm.expect(pm.response.json().details.length).to.eql(2);pm.expect(pm.response.json().totalPrice).to.eql(2100000);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel booking preserves details",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{oneBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Cancel booking preserves details: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Cancelled with history',()=>{pm.expect(pm.response.json().bookingStatus).to.eql(2);pm.expect(pm.response.json().details.length).to.eql(2);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancelled booking releases dates",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{otherToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Cancelled booking releases dates: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('replacementBooking',pm.response.json().bookingReservationId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conflicting reactivation rejected",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{oneBooking}}/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"bookingStatus\": 1}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Conflicting reactivation rejected: HTTP 409',()=>pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Referenced customer protected",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers/{{customerId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Referenced customer protected: HTTP 409',()=>pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Referenced room deactivated",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms/{{bookingRoom2}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Referenced room deactivated: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('History-safe room result',()=>pm.expect(pm.response.json().message).to.include('deactivated'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inactive room booking rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"rooms\": [{\"roomId\": \"{{bookingRoom2}}\", \"startDate\": \"{{stayStart}}\", \"endDate\": \"{{stayEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Inactive room booking rejected: HTTP 409',()=>pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "History still accessible",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bookings/{{multiBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('History still accessible: HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Details preserved',()=>pm.expect(pm.response.json().details.length).to.eql(2));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel multi booking",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{multiBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Cancel multi booking: HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel replacement booking",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{replacementBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Cancel replacement booking: HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff offline booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customerId\": \"{{customerId}}\", \"bookingStatus\": 1, \"rooms\": [{\"roomId\": \"{{bookingRoom1}}\", \"startDate\": \"{{stayEnd}}\", \"endDate\": \"{{laterEnd}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff offline booking: HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('offlineBooking',pm.response.json().bookingReservationId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cancel offline fixture",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/bookings/{{offlineBooking}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Cancel offline fixture: HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Deactivate fixture room",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/rooms/{{bookingRoom1}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Deactivate fixture room: HTTP 200',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

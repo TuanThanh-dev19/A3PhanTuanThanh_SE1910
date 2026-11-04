@@ -44,10 +44,18 @@ Public: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/rooms`, GET
 
 Registration body: `{profile: {customerFullName, telephone, emailAddress, customerBirthday}, password}`. Login body: `{email, password}`. DTO validation enforces lengths, email, past birthday and telephone shape. Passwords require 8-64 characters and at most 72 UTF-8 bytes. Duplicate/reserved emails return 409. Validation returns 400 plus fieldErrors; absent/invalid token returns 401, wrong role 403. Profile DTOs exclude passwords.
 
-Booking transactions/overlap checks remain planned for A3-04. The existing FKs already prevent cascade loss.
+Booking transactions/overlap checks are implemented in A3-04 below. The existing FKs already prevent cascade loss.
 
 ## Staff management (implemented A3-03)
 
 `StaffManagementController` -> `StaffManagementService` -> repositories. STAFF can GET/list/search, POST, PUT and DELETE `/api/staff/customers` and `/api/staff/rooms` (item operations use `/{id}`). Lists accept `?search=` (maximum 100 characters). Customer search matches name/email; room search matches number/description. GET `/api/room-types` supplies options.
 
 Staff customer bodies contain validated `profile`, `customerStatus` (1 active/2 inactive), and a password required on create, optional on update. DTOs never include password hashes. Referenced customers cannot be deleted (409); staff can deactivate them. Room bodies validate number/description/capacity/type/status/positive money up to 1,000,000,000 with at most four decimal places. Room numbers are checked for duplicates in the service. Room writes/deletion acquire a pessimistic row lock. A referenced room is deactivated (status 2) by DELETE; an unused room is physically deleted. Foreign keys remain a second history safeguard.
+
+## Booking APIs and rules (implemented A3-04)
+
+Customer: POST `/api/bookings`, GET `/api/bookings`, GET `/api/bookings/{id}`. Identity comes only from the JWT subject; another customer's item returns 404. Staff: GET/search and POST `/api/staff/bookings`, GET/PUT/DELETE `/api/staff/bookings/{id}`, PATCH `/api/staff/bookings/{id}/status`. Staff search matches ID/customer name/email. DELETE is cancellation (status 2), preserving the reservation and details; status 1 is active.
+
+Request details contain only roomId/startDate/endDate. One booking may contain 1-20 distinct rooms. This limit is an implementation decision for an individual assignment. Staff requests also contain customerId and bookingStatus. Dates must start today or later and checkout must be after check-in; checkout year is at most 9999. Half-open ranges `[start,end)` allow adjacent stays. Inactive rooms and overlapping active reservations return 409. Cancelled reservations do not block dates.
+
+BookingService locks the reservation for staff edits and every affected room in ascending ID order; locks remain held for the transaction. All rooms are checked before any booking/detail write. ActualPrice snapshots the current nightly price; TotalPrice sums nightly price times nights using BigDecimal. Client totals are ignored. Staff PUT explicitly manages the room-detail set and recomputes totals; failed edits roll back. Cancellation preserves detail rows and prices. React booking and staff interfaces remain planned for A3-05/A3-06.

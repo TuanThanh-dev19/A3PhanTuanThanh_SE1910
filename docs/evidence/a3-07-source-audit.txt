@@ -1,0 +1,8 @@
+Final source audit on 2026-11-04, Asia/Bangkok.
+PASS: 76 source/config files supporting comments contain the required Author header in their first five lines.
+PASS: JSON candidates parse successfully; generated wrappers were not edited merely to add comments.
+PASS: exact known local database/staff/JWT secrets and common private-key/GitHub/AWS/JWT patterns were absent from candidate text files.
+PASS: local properties, tmp, target, node_modules and dist are ignored.
+PASS: exactly seven docs Markdown files and evidence/.gitkeep exist; all relative README/docs links resolve.
+PASS: expected GitHub origin and feature/a3-hotel branch verified.
+Scope: actual source inspection and exact-value/pattern checks, not a guarantee against every possible secret encoding.

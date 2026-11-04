@@ -1,0 +1,48 @@
+Command: mvn -B clean verify
+Actual SQL Server test/Maven output excerpts.
+
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.88 s -- in fpt.edu.a3phantuanthanh_se1910.A3PhanTuanThanhSe1910ApplicationTests
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.170 s -- in fpt.edu.a3phantuanthanh_se1910.AuthApiTests
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.362 s -- in fpt.edu.a3phantuanthanh_se1910.BookingApiTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.651 s -- in fpt.edu.a3phantuanthanh_se1910.BookingConcurrencyTests
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.048 s -- in fpt.edu.a3phantuanthanh_se1910.StaffManagementApiTests
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  38.600 s
+[INFO] Finished at: 2026-11-04T19:39:16+07:00
+
+Actual JUnit reports:
+fpt.edu.a3phantuanthanh_se1910.A3PhanTuanThanhSe1910ApplicationTests: tests=7, failures=0, errors=0, skipped=0
+  connectsToSqlServerAndMapsAllFiveTables
+  allForeignKeysRejectCascadingDeletes
+  publicCatalogReadsSeededRoomsWithoutCredentials
+  passwordColumnStoresMoreThanFiftyCharacters
+  persistsRelationshipsCompositeKeyAndSequenceAndRejectsHistoryDeletion
+  unauthenticatedWriteIsRejected
+  publicCatalogReadsRoomTypes
+fpt.edu.a3phantuanthanh_se1910.AuthApiTests: tests=8, failures=0, errors=0, skipped=0
+  oversizedUtf8PasswordIsRejectedWithoutServerError
+  invalidRegistrationAndReservedStaffEmailAreRejected
+  invalidBirthdayAndDuplicateProfileEmailAreRejected
+  invalidAndExpiredTokensAreRejected
+  wrongPasswordIsRejected
+  validCustomerTokenReadsAndUpdatesOwnProfile
+  missingTokenAndWrongRolesAreRejected
+  registrationHashesPasswordAndRejectsDuplicateEmail
+fpt.edu.a3phantuanthanh_se1910.BookingApiTests: tests=8, failures=0, errors=0, skipped=0
+  rejectsOverlapsButAllowsAdjacentStays
+  staffEditsDetailsAndCancellationPreservesHistory
+  createsOneAndManyRoomsWithServerTotalsAndDifferentIds
+  inactiveRoomAndEmptyDetailsAreRejected
+  wrongRoleCannotCreateCustomerBookingOrReadStaffBookings
+  failedStaffEditKeepsOriginalDetailsAndTotal
+  historyAndItemLookupRespectCustomerOwnership
+  invalidOrMissingRoomLeavesNoPartialReservation
+fpt.edu.a3phantuanthanh_se1910.BookingConcurrencyTests: tests=1, failures=0, errors=0, skipped=0
+  simultaneousRequestsCannotDoubleBookTheSameRoom
+fpt.edu.a3phantuanthanh_se1910.StaffManagementApiTests: tests=5, failures=0, errors=0, skipped=0
+  staffCreatesSearchesUpdatesAndDeletesUnusedRoom
+  validationDuplicatesAndMissingRecordsAreRejected
+  databaseAlsoRejectsDuplicateRoomNumbers
+  deletionDeactivatesBookedRoomAndProtectsCustomerHistory
+  staffCreatesSearchesUpdatesAndDeletesCustomer

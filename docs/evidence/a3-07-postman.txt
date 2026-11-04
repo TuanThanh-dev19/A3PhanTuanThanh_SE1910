@@ -1,0 +1,96 @@
+Command: ./scripts/run-postman.ps1 -Collection postman/a3-07-regression.postman_collection.json
+Actual local CLI assertion/report excerpts; credentials and JWTs excluded.
+
+  Pass  Public rooms: HTTP 200
+  Pass  Seeded room catalog
+  Pass  Register customer: HTTP 201
+  Pass  Safe customer DTO
+  Pass  Duplicate email: HTTP 409
+  Pass  Wrong password: HTTP 401
+  Pass  Customer login: HTTP 200
+  Pass  Customer role
+  Pass  Own profile: HTTP 200
+  Pass  Own customer identity
+  Pass  Update profile: HTTP 200
+  Pass  Missing token: HTTP 401
+  Pass  Invalid token: HTTP 401
+  Pass  Customer denied staff access: HTTP 403
+  Pass  Staff login: HTTP 200
+  Pass  Staff role
+  Pass  Staff denied customer profile: HTTP 403
+  Pass  Invalid registration: HTTP 400
+  Pass  Room type options: HTTP 200
+  Pass  Create room: HTTP 201
+  Pass  Search room: HTTP 200
+  Pass  One matching room
+  Pass  Update room: HTTP 200
+  Pass  Updated price
+  Pass  Duplicate room number: HTTP 409
+  Pass  Invalid room: HTTP 400
+  Pass  Delete unused room: HTTP 200
+  Pass  Deleted room is missing: HTTP 404
+  Pass  Create customer: HTTP 201
+  Pass  Search customer: HTTP 200
+  Pass  One matching customer
+  Pass  Update customer: HTTP 200
+  Pass  Delete unused customer: HTTP 204
+  Pass  Customer is missing: HTTP 404
+  Pass  Create bookingRoom1: HTTP 201
+  Pass  Create bookingRoom2: HTTP 201
+  Pass  One-room booking: HTTP 201
+  Pass  Server total overrides client input
+  Pass  Multi-room booking: HTTP 201
+  Pass  Two details and server total
+  Pass  Overlapping dates: HTTP 409
+  Pass  Duplicate room details: HTTP 400
+  Pass  Invalid dates: HTTP 400
+  Pass  Missing room rollback: HTTP 404
+  Pass  Own history: HTTP 200
+  Pass  Own history has created booking
+  Pass  Register other customer: HTTP 201
+  Pass  Other customer login: HTTP 200
+  Pass  Other customer cannot read booking: HTTP 404
+  Pass  Staff reservation search: HTTP 200
+  Pass  Staff sees both customer bookings
+  Pass  Staff edits details: HTTP 200
+  Pass  Updated details and total
+  Pass  Cancel booking preserves details: HTTP 200
+  Pass  Cancelled with history
+  Pass  Cancelled booking releases dates: HTTP 201
+  Pass  Conflicting reactivation rejected: HTTP 409
+  Pass  Referenced customer protected: HTTP 409
+  Pass  Referenced room deactivated: HTTP 200
+  Pass  History-safe room result
+  Pass  Inactive room booking rejected: HTTP 409
+  Pass  History still accessible: HTTP 200
+  Pass  Details preserved
+  Pass  Cancel multi booking: HTTP 200
+  Pass  Cancel replacement booking: HTTP 200
+  Pass  Staff offline booking: HTTP 201
+  Pass  Cancel offline fixture: HTTP 200
+  Pass  Deactivate fixture room: HTTP 200
+  Pass  Guest staff write denied: HTTP 401
+  Pass  Customer staff booking write denied: HTTP 403
+  Pass  Invalid booking status rejected: HTTP 400
+  Pass  Null booking detail rejected: HTTP 400
+  Pass  Customer list excludes password hashes: HTTP 200
+  Pass  No password hashes in any customer DTO
+----------------------------------------------------------------------
+|                         |            executed |             failed |
+--------------------------+---------------------+---------------------
+|              iterations |                   1 |                  0 |
+--------------------------+---------------------+---------------------
+|                requests |                  57 |                  0 |
+--------------------------+---------------------+---------------------
+|            test-scripts |                  57 |                  0 |
+--------------------------+---------------------+---------------------
+|      prerequest-scripts |                  57 |                  0 |
+--------------------------+---------------------+---------------------
+|              assertions |                  74 |                  0 |
+----------------------------------------------------------------------
+| total run duration: 8.1 s                                          |
+----------------------------------------------------------------------
+| total data received: 15.11 KB (approx)                             |
+----------------------------------------------------------------------
+| average response time: 56 ms [min: 4 ms, max: 572 ms, s.d.: 79 ms] |
+----------------------------------------------------------------------

@@ -8,8 +8,19 @@
 | 2026-11-04 / A3-01 | Default-profile startup failed on port 8080; proxy received an unrelated 401 response | Startup log explicitly reported 8080 already in use by another application | Changed the A3 default/proxy to 8081; preserve the other application; final startup/browser result recorded in evidence | A3-01 SHA recorded in development-plan.md after commit |
 | 2026-11-04 / A3-01 | HTTP verification script reported too few seeded rows while the API returned three rooms | Wrapping Invoke-RestMethod in @() produced one nested Object[]; reproduced wrapped count 1 versus direct count 3 | Assigned the JSON response directly; verification script passed room/type counts and proxy comparisons | A3-01 SHA recorded in development-plan.md after commit |
 
-No known application defect remains from the executed A3-01 tests. Later-stage features remain unimplemented and untested. Java 21 prints a Mockito dynamic-agent warning during tests; it does not cause a test failure.
+The table records historical bootstrap issues; all listed fixes were retested. Java 21 prints a Mockito dynamic-agent warning during tests; it does not cause a test failure.
 
 A3-02: Maven repackage encountered the existing A3-01 JAR lock. Stopped that verified process, reran clean verify successfully and added scripts/start-backend.ps1 to run an ignored JAR copy. The seven authentication tests and seven bootstrap regressions passed after the fix.
 
 A3-05 browser fixes (2026-11-04): native date filling initially left birthday state empty, producing an actual 400 from the server. Added onInput synchronization to date fields; customer create/edit then succeeded. Repeated room selects had labels containing option text, causing ambiguous selection; explicit aria-label values fixed two-room editing. Windows default-encoding reads corrupted a separator in BookingEditor; normalized JSX separators to ASCII and used explicit UTF-8 reads. Final UI actions and production build passed. GitHub intermittently returned HTTP 500 during A3-03/A3-04 pushes; normal retries (including HTTP/1.1 for A3-04) succeeded and remote SHAs were verified.
+
+## A3-07 final review and verification
+
+- Room-number uniqueness was checked only by the service. Added named SQL/JPA uniqueness for concurrent staff writes; applied the repeatable migration and passed a direct duplicate-insert regression.
+- Added simultaneous-booking and failed-staff-edit regressions: one concurrent request succeeds/one conflicts; a rejected edit leaves details/total unchanged. The clean build passes all 29 backend tests.
+- UTC ISO strings could choose the previous calendar day just after Bangkok midnight. Replaced UI default-date formatting with localDate and passed three date-boundary tests.
+- Added request counters so an older staff list response cannot replace a newer search result; final cold-start staff search displayed only the requested customer's booking.
+- Bulk formatting/dependency reoptimization was followed by an unreachable development preview and a transient context error in its hot-reload log. Restarted only the verified assignment Vite process; fresh staff/customer sessions and final error-log inspections passed. No final cold-start defect remains from that incident.
+- Resumed the interrupted A3-07 working tree without restarting earlier stages. Reran 29 backend tests, 3 frontend tests, format/build and 57-request/74-assertion Postman regression. Restored the dedicated UI customer's temporary deactivation before final history verification.
+
+No known blocking application issue remains from the executed checks. Stage SHAs are recorded in [development-plan.md](development-plan.md).

@@ -1,0 +1,6 @@
+
+> a3phantuanthanh_se1910@0.0.1 format:check
+> prettier --check "src/**/*.{js,jsx,css}" vite.config.js index.html
+
+Checking formatting...
+All matched files use Prettier code style!

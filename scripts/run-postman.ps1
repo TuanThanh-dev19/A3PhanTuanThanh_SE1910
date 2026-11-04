@@ -3,14 +3,19 @@ param([Parameter(Mandatory = $true)][string]$Collection)
 $ErrorActionPreference = 'Stop'
 $a3Root = Split-Path $PSScriptRoot -Parent
 $a3Config = @{}
-Get-Content -LiteralPath (Join-Path $a3Root 'application-local.properties') | ForEach-Object {
-    if ($_ -match '^([^#=]+)=(.*)$') { $a3Config[$Matches[1].Trim()] = $Matches[2] }
+if (Test-Path -LiteralPath (Join-Path $a3Root 'application-local.properties')) {
+    Get-Content -LiteralPath (Join-Path $a3Root 'application-local.properties') | ForEach-Object {
+        if ($_ -match '^([^#=]+)=(.*)$') { $a3Config[$Matches[1].Trim()] = $Matches[2] }
+    }
 }
+$a3StaffEmail = if ($env:STAFF_EMAIL) { $env:STAFF_EMAIL } else { $a3Config['app.staff.email'] }
+$a3StaffPassword = if ($env:STAFF_PASSWORD) { $env:STAFF_PASSWORD } else { $a3Config['app.staff.password'] }
+if (-not $a3StaffEmail -or -not $a3StaffPassword) { throw 'Configure STAFF_EMAIL and STAFF_PASSWORD, or the ignored local properties, before running Postman.' }
 $a3Environment = @{
     name = 'Local assignment verification'
     values = @(
-        @{ key = 'staffEmail'; value = $a3Config['app.staff.email']; enabled = $true },
-        @{ key = 'staffPassword'; value = $a3Config['app.staff.password']; enabled = $true; type = 'secret' }
+        @{ key = 'staffEmail'; value = $a3StaffEmail; enabled = $true },
+        @{ key = 'staffPassword'; value = $a3StaffPassword; enabled = $true; type = 'secret' }
     )
 }
 $a3Temp = Join-Path $a3Root 'tmp'

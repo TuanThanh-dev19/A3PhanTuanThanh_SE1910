@@ -27,5 +27,10 @@ ALTER TABLE dbo.BookingDetail DROP CONSTRAINT FK_BookingDetail_BookingReservatio
 ALTER TABLE dbo.BookingDetail ADD CONSTRAINT FK_BookingDetail_BookingReservation
     FOREIGN KEY (BookingReservationID) REFERENCES dbo.BookingReservation(BookingReservationID);
 
+-- Back the service's room-number check with a constraint for concurrent staff requests.
+IF NOT EXISTS (SELECT 1 FROM sys.key_constraints WHERE name = N'UQ_RoomInformation_RoomNumber'
+               AND parent_object_id = OBJECT_ID(N'dbo.RoomInformation'))
+    ALTER TABLE dbo.RoomInformation ADD CONSTRAINT UQ_RoomInformation_RoomNumber UNIQUE (RoomNumber);
+
 COMMIT TRANSACTION;
 GO

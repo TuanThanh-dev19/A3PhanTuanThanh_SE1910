@@ -2,36 +2,38 @@
 
 # Requirements
 
-## Assignment requirements
+Sources reviewed: all six pages of Assignment 03 (including its schema diagram), the supplied Assignment 02 SQL and the user's seven-stage plan. The PDF's isolated vehicles/news wording conflicts with its hotel schema and main functions; the hotel requirements govern this project.
 
-Sources reviewed: all six pages of the supplied Assignment 03 PDF, its database diagram, the supplied Assignment 02 SQL, and the user's seven-stage Markdown plan. The PDF's isolated references to vehicles/news are inconsistent with the hotel schema and main functions; hotel requirements govern this implementation.
+## Assignment requirements and implementation
 
-Build FUMiniHotelSystem with Spring Boot **3**, SQL Server, Spring Data JPA, a Controller -> Service -> Repository architecture, React and Axios. Secure later stages with Spring Security/JWT. Validate inputs, exercise APIs through Postman and test real frontend/backend interactions.
+| Requirement | Implemented behavior |
+| --- | --- |
+| Spring Boot 3, SQL Server, JPA and three layers | Boot 3.5.16; Controller -> Service -> Repository; five mapped entities |
+| Required project/database name | A3PhanTuanThanh_SE1910; root Spring project and named React directory |
+| Public room information | Guest GET rooms and React catalog without authentication |
+| Customer account and JWT | Registration, email/password login, BCrypt storage, one-hour signed JWT |
+| Staff account from application properties | Environment/ignored application-local.properties; no Staff table |
+| Customer profile and history | Own profile GET/PUT, own reservation list/item, no password DTOs |
+| Online multi-room booking | One transaction, one or many room details, server-calculated total |
+| Staff management/CRUD/search | Customer, room and booking APIs/screens including reservation details |
+| Room deletion rule | Unreferenced room deleted; referenced room deactivated; history remains |
+| React/Axios, validation and testing | Role routes, real REST calls, DTO/client checks, Postman and browser verification |
 
-Database, Spring project and React project: `A3PhanTuanThanh_SE1910`. Author: Phan Tuan Thanh - CE190595. All project UI, errors, comments and documentation are English.
+| Role | Allowed scope |
+| --- | --- |
+| Guest | Browse rooms/types, register and sign in |
+| Customer | Public catalog plus own profile, online booking and own history |
+| Staff | Public catalog plus customer/room/reservation/detail management and search |
 
-| Role | Required access | A3-01 state |
-| --- | --- | --- |
-| Guest | View room information without authentication | Read-only catalog preview implemented |
-| Customer | Register, email/password JWT login, own profile, create one/many-room booking, own booking history | Authentication/profile APIs implemented; Booking/profile/authentication APIs implemented; customer screens implemented A3-06 |
-| Staff | Login from application configuration; manage customers, rooms, reservations and details; CRUD/search | Configured login/customer-room APIs implemented; Booking/customer-room APIs implemented; staff screens implemented A3-05 |
-
-A room may be hard-deleted only if no booking detail references it. Otherwise change its status and preserve history. A room belongs to one room type; a customer has many reservations; each reservation has one or more details, with one room per detail. `BookingDetail` has composite PK `(BookingReservationID, RoomID)`.
+Customer ID is derived from JWT for customer operations; another customer's booking returns 404. Staff cannot use customer-only routes. The model is RoomType -> RoomInformation, Customer -> BookingReservation, and BookingDetail joining reservations/rooms with composite PK (BookingReservationID, RoomID).
 
 ## Plan requirements and implementation decisions
 
-| Item | Basis | Decision/current state |
-| --- | --- | --- |
-| Five SQL/JPA entities | Assignment/schema | All mapped, including four lazy many-to-one relationships and composite key |
-| SQL bootstrap and seed | User plan | Original SQL preserved externally; separate original-derived A3 schema, migration, seed |
-| Password storage length | Plan, BCrypt compatibility | `nvarchar(255)`; BCrypt hashing implemented in A3-02 |
-| Reservation IDs | Plan, safe allocation | SQL Server sequence, increment/allocation 1 |
-| Delete cascades | Plan, history protection | Four FKs use `NO ACTION`; no JPA remove cascades |
-| Schema generation | Assignment JPA objective | Explicit bootstrap profile creates tables; normal startup validates |
-| Currency/status | Implementation decision | Seed prices displayed as VND; room status 1 = active, 2 = inactive (future writes) |
-| Overlap definition | Not specified by assignment | Half-open date ranges `[start, end)` and transactional validation implemented in A3-04 |
-| Historical customer deletion | Plan | Service rejects customers with booking history; FK also protects records |
-| Development networking | Local decision | Loopback backend 8081; Vite 5173 with `/api` proxy |
-| Secrets | User requirement | Environment/ignored local properties, placeholders only in Git |
+- Required by plan: Java 21, separate A3 SQL scripts, password width 255, SQL Server sequence (never MAX+1), seed data, no cascade history loss, seven English docs and real evidence, staged normal Git pushes.
+- Status decisions: customer/room 1 active and 2 inactive; booking 1 active and 2 cancelled. DELETE reservation means cancellation; referenced customer deletion returns 409 so staff can deactivate instead.
+- Booking decisions: 1-20 distinct rooms; dates start today or later, checkout follows check-in, year at most 9999; half-open [start,end) permits adjacent stays. Cancelled bookings do not block dates. Room locks serialize overlap checks; BigDecimal calculates nightly price times nights. Client totals are ignored.
+- Room decisions: unique room number, positive capacity and nightly price; price at most 1,000,000,000 with up to four decimal places. Currency is VND. These limits/status meanings are implementation choices rather than exact PDF wording.
+- JPA bootstrap explicitly creates tables; ordinary startup validates. SQL migration/seed are manual and repeatable. Four FKs use NO ACTION and JPA relationships have no remove cascade.
+- All created/modified source files have Author: Phan Tuan Thanh - CE190595 where comments are supported. JSON and untouched generated wrappers follow the user's exceptions. Credentials and generated output are ignored.
 
-Deliver exactly one stage at a time with real checks, updated docs/evidence, English commit and a normal GitHub push. Never mark unexecuted cases PASS. A3-02 authentication/profile is implemented; A3-03 staff customer/room APIs are implemented; A3-04 booking APIs are implemented; A3-05 public/auth/staff screens are implemented; A3-06 customer screens are implemented; final A3-07 regression/documentation remains pending.
+A3-01 through A3-06 were completed sequentially and pushed before later implementation. Final verification and Git closure are recorded in [development-plan.md](development-plan.md) and [test-matrix.md](test-matrix.md).

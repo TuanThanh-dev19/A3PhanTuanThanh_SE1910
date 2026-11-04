@@ -74,4 +74,12 @@ class AuthApiTests extends ApiTestSupport {
                 .content("{\"customerFullName\":\"Test\",\"telephone\":\"0901234567\",\"emailAddress\":\"test@example.com\",\"customerBirthday\":\"2999-01-01\"}"))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.fieldErrors.customerBirthday").exists());
     }
+
+    @Test void oversizedUtf8PasswordIsRejectedWithoutServerError() throws Exception {
+        String email=uniqueEmail(); register(email,password()).andExpect(status().isCreated());
+        mvc.perform(post("/api/auth/login").contentType("application/json")
+                .content(json.writeValueAsString(Map.of("email",email,"password","\u00e9".repeat(64)))))
+                .andExpect(status().isUnauthorized());
+        register(uniqueEmail(),"\u00e9".repeat(64)).andExpect(status().isBadRequest());
+    }
 }

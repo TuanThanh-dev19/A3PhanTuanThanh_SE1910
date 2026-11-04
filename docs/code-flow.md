@@ -2,40 +2,34 @@
 
 # Code flow
 
-All backend paths below begin at `src/main/java/fpt/edu/a3phantuanthanh_se1910/`.
+Backend paths below are relative to src/main/java/fpt/edu/a3phantuanthanh_se1910/; frontend paths are relative to frontend/A3PhanTuanThanh_SE1910/src/.
 
-## Guest room catalog (implemented)
+## 1. Registration, login, JWT and profile
 
-1. `frontend/A3PhanTuanThanh_SE1910/src/main.jsx` mounts `App`.
-2. `src/App.jsx` uses an effect to call Axios `api.get('/rooms')` and `api.get('/room-types')`; `src/api.js` sets base URL `/api` and a ten-second timeout. Cleanup aborts stale requests.
-3. `vite.config.js` forwards `/api` from port 5173 to backend port 8081.
-4. `controller/RoomCatalogController.java` routes GET requests to `service/RoomCatalogService.java` (`listRooms`, `listRoomTypes`).
-5. The read-only service calls the ordered query methods in `repository/RoomInformationRepository.java` and `repository/RoomTypeRepository.java`. SQL Server supplies the persisted records.
-6. The service maps entities to `dto/RoomResponse.java` / `dto/RoomTypeResponse.java` while the transaction is open. Spring serializes JSON; React renders the data, empty state, loading state or English error message.
-7. `controller/ApiExceptionHandler.java` maps database access failures to HTTP 503 with a generic message.
+pages/AuthPages.jsx -> Axios api.js -> controller/AuthController.java -> service/AuthService.java -> repository/CustomerRepository.java. Register validates the nested profile/password DTO, normalizes and checks email, BCrypt-hashes the password and saves an active customer. Login verifies the customer hash or configured staff hash, then JwtEncoder returns token/role/name/expiresIn.
 
-## Schema and persistence (implemented)
+config/SecurityConfig.java installs Spring Security's bearer filter, validates signature/issuer/time and maps roles before controller access. AuthContext.jsx/session.js preserve the one-hour tab session. The Axios interceptor attaches JWT and clears session on 401. pages/ProfilePage.jsx GETs/PUTs /profile; the backend derives ID from JWT and rechecks active status. CustomerResponse contains no password/hash.
 
-`A3PhanTuanThanhSe1910Application.main` starts Spring and scans five JPA repositories. `application.properties` loads environment/ignored local settings and validates SQL mappings. With explicit `bootstrap`, `application-bootstrap.properties` enables schema creation through Hibernate. `entity/BookingDetailId.java` implements serializable composite identity with equality/hash code; `entity/BookingDetail.java` maps both FK components using `@MapsId`. `entity/BookingReservation.java` allocates IDs through `BookingReservationSequence`.
+## 2. Guest room browsing
 
-`src/test/java/fpt/edu/a3phantuanthanh_se1910/A3PhanTuanThanhSe1910ApplicationTests.java` exercises the real SQL Server and rolls back test rows. `scripts/verify-a3-01.ps1` compares direct API responses with frontend-proxied data.
+App.jsx -> pages/RoomsPage.jsx -> GET /api/rooms through the Vite proxy -> controller/RoomCatalogController.java -> service/RoomCatalogService.java -> RoomInformationRepository/RoomTypeRepository -> SQL Server. The read-only service maps room/type fields into DTO records while its persistence context is open. React renders rooms, status, price or an actual error/empty/loading state. No mock catalog is used.
 
-## Registration/login/JWT and profile (implemented A3-02)
+## 3. Customer multi-room booking and own history
 
-`controller/AuthController.java` validates registration/login/profile DTOs and calls `service/AuthService.java`. Registration normalizes email, checks uniqueness/reserved staff email, hashes the password and saves a customer. Login compares BCrypt against the customer hash or the configured staff password hash and uses JwtEncoder to issue a one-hour token. Spring Security's bearer-token filter validates signature/issuer/time and maps role claims before controller access. GET/PUT `/api/profile` derive the customer ID from the validated JWT subject and require an active account; callers cannot choose another customer ID.
+pages/CustomerBooking.jsx loads active rooms; components/BookingEditor.jsx collects distinct room IDs and check-in/out dates. POST /api/bookings -> controller/BookingController.java -> service/BookingService.java#create/save. JWT supplies customer ID. The service validates the full draft, locks rooms in order, checks status/overlap, allocates a sequence ID, calculates prices and saves all details in one transaction.
 
-`controller/ApiExceptionHandler.java` returns English messages, field-level validation errors and generic database conflict/unavailable responses. `AuthApiTests.java` checks BCrypt, duplicate/reserved emails, valid/invalid/expired tokens, role boundaries and profile validation. The local Postman collection checks the running application; tokens/credentials remain runtime variables.
+The response navigates to /history. pages/HistoryPage.jsx calls GET /api/bookings; BookingService.history/ownBooking restrict results to the authenticated customer. components/BookingDetails.jsx renders stored dates, nightly prices and line totals. Another customer's item returns 404. Server overlap and validation messages pass through errorMessage/Notice.
 
-## Booking and staff flows
+## 4. Staff CRUD/search and safe deletion
 
-A3-03 staff management is implemented: StaffManagementController validates DTOs and role security permits only STAFF. StaffManagementService searches repositories, applies AuthService profile/password validation and saves records. deleteRoom locks the room, calls BookingDetailRepository.existsByRoomRoomId, then deactivates referenced rooms or deletes unused rooms. deleteCustomer rejects existing reservation history. StaffManagementApiTests exercises CRUD/search/validation and actual history preservation.
+pages/StaffCustomers.jsx / pages/StaffRooms.jsx -> /api/staff/... -> controller/StaffManagementController.java -> service/StaffManagementService.java -> repositories. Only STAFF reaches these endpoints. Validated create/edit forms persist real data; query methods search name/email or number/description. Room writes use a row lock and a database unique-number constraint.
 
-BookingController validates BookingRequest/StaffBookingRequest and calls BookingService. Customer creation reads identity from JWT; save locks affected rooms, validates active status/dates/overlap, allocates a sequence ID, calculates totals and saves all details in one transaction. history/ownBooking restrict customer ownership; staff methods use STAFF routes. changeStatus cancels/reactivates while retaining details, with availability validation on reactivation. BookingApiTests exercises server totals, adjacent/overlapping dates, failed multi-room rollback, ownership, detail edits and cancellation. React authentication/staff screens are implemented; customer screens are implemented in A3-06.
+deleteRoom checks BookingDetailRepository.existsByRoomRoomId: referenced room -> status 2; unused room -> delete. deleteCustomer checks reservation history and rejects deletion with 409. Four NO ACTION FKs provide a second history safeguard.
 
-## React staff flow (implemented A3-05)
+pages/StaffBookings.jsx -> BookingController staff methods -> BookingService list/get/saveStaff/changeStatus. Staff can create offline reservations, edit room/date details and cancel/reactivate. Cancellation preserves reservation/detail rows; availability is checked on reactivation.
 
-LoginPage in pages/AuthPages.jsx POSTs credentials to /auth/login; AuthContext stores the returned session. session.js reads/validates expiry on refresh. api.js attaches Authorization and formats English field errors. App.jsx protects staff routes and renders staff navigation. StaffCustomers and StaffRooms load/search, edit validated form state and save through Axios, then reload real rows. Delete controls explain history behavior and require an inline confirmation. StaffBookings loads customer/room options and reservations, uses BookingEditor for create/edit, BookingDetails for inspection and PATCH status for cancellation/reactivation. Notice renders actual server messages. Date controls handle native input events as well as change events to keep state synchronized.
+## Verification locations
 
-## React customer flow (implemented A3-06)
+src/test/java/fpt/edu/a3phantuanthanh_se1910/: bootstrap mapping tests, AuthApiTests, StaffManagementApiTests, BookingApiTests and BookingConcurrencyTests. The concurrency test uses two independent transactions; its dedicated fixtures are cleaned explicitly. Other backend fixtures roll back.
 
-RegisterPage -> POST /auth/register -> LoginPage -> POST /auth/login -> CUSTOMER navigation. ProfilePage -> GET/PUT /profile -> updateSessionName. CustomerBooking -> GET /rooms (filter active) -> BookingEditor -> POST /bookings -> /history. HistoryPage -> GET /bookings -> own reservation table and BookingDetails. Server overlap/validation messages flow through errorMessage and Notice. Logout clears sessionStorage and AuthContext; Protected redirects /history or /profile to sign-in. Browser evidence follows this entire flow and then a staff search/view of the same newly created booking.
+date.test.js verifies local calendar boundaries with Node's test runner. postman/a3-07-regression.postman_collection.json exercises the running API with runtime-only credentials/tokens. Browser steps and actual screenshots are linked from [test-matrix.md](test-matrix.md).

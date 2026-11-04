@@ -13,7 +13,7 @@ public class BookingReservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "booking_sequence")
-    @SequenceGenerator(name = "booking_sequence", sequenceName = "BookingReservationSequence", allocationSize = 1)
+    @SequenceGenerator(name = "booking_sequence", sequenceName = "BookingReservationSequence", schema = "dbo", allocationSize = 1)
     @Column(name = "BookingReservationID")
     private Integer bookingReservationId;
 

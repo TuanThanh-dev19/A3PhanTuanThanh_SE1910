@@ -5,6 +5,8 @@ import fpt.edu.a3phantuanthanh_se1910.entity.*;
 import fpt.edu.a3phantuanthanh_se1910.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -13,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class StaffManagementApiTests extends ApiTestSupport {
+    @Autowired JdbcTemplate jdbc;
     @Autowired RoomInformationRepository rooms;
     @Autowired CustomerRepository customers;
     @Autowired BookingReservationRepository bookings;
@@ -77,5 +80,10 @@ class StaffManagementApiTests extends ApiTestSupport {
                 .content(json.writeValueAsString(room("101")))).andExpect(status().isConflict());
         mvc.perform(get("/api/staff/customers/2147483647").header("Authorization","Bearer "+staff)).andExpect(status().isNotFound());
         mvc.perform(get("/api/staff/rooms/2147483647").header("Authorization","Bearer "+staff)).andExpect(status().isNotFound());
+    }
+
+    @Test void databaseAlsoRejectsDuplicateRoomNumbers() {
+        assertThatThrownBy(() -> jdbc.update("INSERT dbo.RoomInformation (RoomNumber,RoomTypeID) VALUES (?,?)","101",1))
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

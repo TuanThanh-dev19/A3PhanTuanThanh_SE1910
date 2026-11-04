@@ -2,69 +2,33 @@
 
 # Test matrix
 
-Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 2022 assignment database. PASS means the scenario was actually executed. Later stages remain NOT RUN.
+Final checks executed on 2026-11-04, Asia/Bangkok. The resumed final run verified **29 backend tests (0 failures/errors/skips)**, **3 frontend tests**, **57 Postman requests / 74 assertions**, formatting and production build. SQL Server 2022 is the actual datasource; browser checks use real APIs.
 
 | ID | Role | Scenario | Expected | Actual | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| A01-01 | Developer | JPA bootstrap on empty A3 database | Backend starts, creates five tables and sequence | Bootstrap started; SQL metadata confirmed five tables/sequence | PASS | [Bootstrap/startup](evidence/a3-01-startup.txt), [SQL](evidence/a3-01-database.txt) |
-| A01-02 | Developer | Normal startup/schema validation | Connect to SQL Server with ddl-auto=validate | Backend started on 8081 and catalog queries succeeded | PASS | [Startup](evidence/a3-01-startup.txt), [HTTP](evidence/a3-01-http-checks.txt) |
-| A01-03 | Developer | Original-derived SQL schema, migration and seed | Five tables; password length 255; sequence; four protected FKs; seed repeatable | Isolated database passed assertions; migration/seed twice retained two types/three rooms; test database removed | PASS | [SQL scripts](evidence/a3-01-sql-scripts.txt) |
-| A01-04 | Guest | GET rooms without credentials | SQL-backed room DTOs and room type relationship | HTTP 200, seeded room 101/Standard/500000; no password fields | PASS | [Postman](evidence/a3-01-postman.txt), [backend tests](evidence/a3-01-backend-build.txt) |
-| A01-05 | Guest | GET room types without credentials | Seeded Standard and Deluxe | HTTP 200 with both types | PASS | [Postman](evidence/a3-01-postman.txt) |
-| A01-06 | Guest | Attempt POST /api/rooms in bootstrap | No mutation endpoint | HTTP 405 in MockMvc integration test | PASS | [Backend tests](evidence/a3-01-backend-build.txt) |
-| A01-07 | Developer | Persist password longer than original 50-character limit | 60-character value round-trips, column 255 | Both database assertions succeeded; row rolled back | PASS | [Backend tests](evidence/a3-01-backend-build.txt) |
-| A01-08 | Developer | Persist reservation/details and relationships | Distinct sequence IDs, composite lookup, money round-trip | Two IDs differed; detail and customer/room/type relationships loaded | PASS | [Backend tests](evidence/a3-01-backend-build.txt) |
-| A01-09 | Developer | Delete room referenced by a test detail | FK rejects deletion; history stays | DataIntegrityViolationException asserted; detail still existed; test rolled back | PASS | [Backend tests](evidence/a3-01-backend-build.txt) |
-| A01-10 | Developer | Verify four FK delete rules | No cascading deletes | Four FKs; zero cascading delete actions | PASS | [Backend tests](evidence/a3-01-backend-build.txt), [SQL](evidence/a3-01-database.txt) |
-| A01-11 | Guest | React -> Axios -> Vite proxy -> backend -> SQL | Render real data and preserve values | Browser showed rooms 101/102/201; direct/proxied JSON matched | PASS | [React screenshot](evidence/a3-01-react-catalog.jpg), [HTTP](evidence/a3-01-http-checks.txt) |
-| A01-12 | Guest | React when A3 backend is offline | Clear English error without fake room data | Browser displayed 'Unable to load rooms. Please try again later.' | PASS | [Error screenshot](evidence/a3-01-api-unavailable.jpg) |
-| A01-13 | Developer | Maven verify / React production build | Relevant tests/builds pass | Seven tests, zero failures/errors/skips; Vite production build succeeded | PASS | [Maven](evidence/a3-01-backend-build.txt), [Vite](evidence/a3-01-frontend-build.txt) |
-| A01-14 | Developer | Author headers, secrets and ignored outputs | Headers where supported; credentials/build outputs excluded | Headers/JSON/docs links checked; local password and common key/token patterns absent; generated output ignored | PASS | [Source audit](evidence/a3-01-source-audit.txt) |
-| A02-01 | Customer | Register/login with valid email/password | BCrypt storage and valid JWT | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A02-02 | Customer | Duplicate email, wrong password, invalid registration | Clear validation/authentication error | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A02-03 | Guest/Customer | Missing/expired/invalid token and wrong role | Protected API rejects request with appropriate status | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A02-04 | Staff | Login using configured staff account | STAFF JWT, no staff table | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A02-05 | Customer | Read/update own profile without password disclosure | Own profile only, valid input, safe DTO | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A03-01 | Staff | Customer and room CRUD/search, room-type selection | Persist/search real records | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
-| A03-02 | Guest/Customer | Attempt staff APIs | Denied | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
-| A03-03 | Staff | Delete unused room versus previously booked room | Hard delete unused room; status change for referenced room | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
-| A03-04 | Staff | Delete customer with history, invalid field values | Preserve history and reject invalid data | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
-| A04-01 | Customer | Create one-room and multi-room booking | One transaction, correct server total and unique ID | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
-| A04-02 | Customer | Missing room, inactive room, invalid dates and overlap | Clear rejection without partial booking | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
-| A04-03 | Customer | Own history versus another customer's booking | Own records only | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
-| A04-04 | Staff | Manage reservations/details with valid and invalid edits | Safe updates and preserved history | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
-| A05-01 | Staff | React login, guarded routes, CRUD/search/details, refresh | Real API workflow and clear errors | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-05-ui.txt) |
-| A06-01 | Customer | Register -> login -> profile -> select rooms -> booking -> history -> logout | Real end-to-end workflow; staff sees new booking | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-06-ui.txt) |
-| A07-01 | All | Full Postman/React regression and permissions | All final requirements verified | Only A3-01 subset executed | NOT RUN | - |
+| DB-01 | Developer | Initial JPA bootstrap | Five mapped tables/sequence | Created during A3-01; current schema validates in final tests | PASS | [Initial startup](evidence/a3-01-startup.txt), [final backend](evidence/a3-07-backend-build.txt) |
+| DB-02 | Developer | Current SQL path; migration/seed twice | Five tables, sequence, password 255, protected FKs, unique rooms; repeatable seed | Isolated SQL assertions passed; dedicated SQL test DB removed | PASS | [Database](evidence/a3-07-database.txt) |
+| AUTH-01 | Customer | Registration/login and BCrypt | Safe DTO, BCrypt match, valid customer JWT | API and database assertions passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| AUTH-02 | Customer | Duplicate/reserved email, wrong password, invalid registration | 409/401/400 as appropriate | Negative cases passed, including oversized UTF-8 password | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| AUTH-03 | All | Missing/invalid/expired JWT; wrong role | 401/403; public catalog remains public | Cases passed; expired JWT checked in AuthApiTests | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| AUTH-04 | Staff | Configured login | STAFF without a Staff table | API and browser login succeeded | PASS | [Postman](evidence/a3-07-postman.txt), [staff screen](evidence/a3-07-staff-final.jpg) |
+| PROF-01 | Customer | Own profile read/update, duplicate email/future birthday | Safe own DTO; valid edits; invalid edits rejected | API and browser checks passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [profile](evidence/a3-06-customer-profile.jpg) |
+| CRUD-01 | Staff | Customer/room create, search, edit, unused deletion | Persist/search/delete actual records | API checks passed; browser create/search/edit succeeded | PASS | [Postman](evidence/a3-07-postman.txt), [staff UI](evidence/a3-05-ui.txt) |
+| CRUD-02 | Staff | Duplicate rooms; invalid/missing records | Conflict, validation and 404 | API, direct SQL uniqueness and browser error checks passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt), [UI](evidence/a3-05-ui.txt) |
+| HIST-01 | Staff | Delete referenced room/customer | Room inactive; customer deletion rejected; retain details | Service and SQL FK preservation checks passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| BOOK-01 | Customer | One/many rooms, sequence IDs, client total ignored | Atomic booking, unique IDs, server total | Single/multi-room assertions passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| BOOK-02 | Customer | Missing/inactive/duplicate rooms; invalid/empty/null details/dates | Reject without partial reservation | Negative cases and reservation-count assertions passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| BOOK-03 | Customer | Overlap and adjacent stays | Conflict for overlap; allow boundary | API and browser overlap checks passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [overlap](evidence/a3-06-overlap-error.jpg) |
+| BOOK-04 | Customer | Own/another customer's history item | Own list/item; other item 404 | Ownership assertions passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [Postman](evidence/a3-07-postman.txt) |
+| BOOK-05 | Staff | Offline create, detail edit, cancel/reactivate | Correct total, retained details, safe reactivation | API/browser checks passed | PASS | [Postman](evidence/a3-07-postman.txt), [staff booking](evidence/a3-05-staff-bookings.jpg) |
+| BOOK-06 | Staff | Conflicting edit | Original details/total unchanged | failedStaffEditKeepsOriginalDetailsAndTotal passed | PASS | [Backend](evidence/a3-07-backend-build.txt) |
+| BOOK-07 | Customer | Simultaneous same-room requests | Exactly one reservation | Independent transactions: one 201, one 409, one detail row | PASS | [Backend](evidence/a3-07-backend-build.txt) |
+| UI-01 | Staff | Login/guards, refresh, CRUD/search/details/errors | Real API workflow, stable session | Executed; final staff search showed booking #39 | PASS | [Staff UI](evidence/a3-05-ui.txt), [final staff](evidence/a3-07-staff-final.jpg) |
+| UI-02 | Customer | Register -> login -> profile -> two rooms -> history -> logout; staff visibility | Complete real workflow | Booking #39: rooms 101/102, total 2100000; staff sees same details | PASS | [Workflow](evidence/a3-06-ui.txt), [final customer](evidence/a3-07-customer-final.jpg), [final UI](evidence/a3-07-ui.txt) |
+| UI-03 | Customer | Real API 401 after account deactivation | Clear session and return to login | Passed; account restored active and history reverified | PASS | [UI log](evidence/a3-07-ui.txt), [session](evidence/a3-07-session-rejected.jpg) |
+| FE-01 | Developer | Bangkok date, year and leap-day boundaries | Correct local calendar dates | 3 tests passed | PASS | [Frontend tests](evidence/a3-07-frontend-tests.txt) |
+| BUILD-01 | Developer | Backend clean verify; frontend format/build | All checks pass | 29 backend tests, format and Vite build passed | PASS | [Backend](evidence/a3-07-backend-build.txt), [format](evidence/a3-07-format-check.txt), [build](evidence/a3-07-frontend-build.txt) |
+| AUDIT-01 | Developer | Headers, JSON, docs links, secrets/generated output | Valid headers/JSON/links; no local credentials in Git candidates | 76 source/config headers checked; JSON/links valid; credential/pattern and ignore checks passed | PASS | [Source audit](evidence/a3-07-source-audit.txt) |
+| GIT-01 | Developer | A3-07 commit/push, remote SHA, clean tree | Normal push and clean tree | Awaiting final commit/push | NOT RUN | Pending Git closure |
 
-A01-09 verifies database history protection, not the later staff soft-delete business rule. Postman A3-01 ran two GET requests with six passing assertions; auth/CRUD/booking Postman checks belong to later stages. Evidence text contains actual concise command output/excerpts, not reconstructed test results. Screenshots capture the browser's real rendered page.
-
-## A3-02 verification
-
-JWT authentication, BCrypt registration, configured staff login, role authorization and own profile APIs.
-
-Backend: [actual Maven result](evidence/a3-02-backend-build.txt). API: [actual Postman result](evidence/a3-02-postman.txt). Source: [author/credential checks](evidence/a3-02-source-audit.txt).
-
-## A3-03 verification
-
-Staff customer/room CRUD and search, room-type lookup, referenced-room deactivation and customer-history protection.
-
-Backend: [actual Maven result](evidence/a3-03-backend-build.txt). API: [actual Postman result](evidence/a3-03-postman.txt). Source: [author/credential checks](evidence/a3-03-source-audit.txt).
-
-## A3-04 verification
-
-Transactional multi-room bookings, ownership, availability/date checks, server totals and staff reservation/detail management.
-
-Backend: [actual Maven result](evidence/a3-04-backend-build.txt). API: [actual Postman result](evidence/a3-04-postman.txt). Source: [author/credential checks](evidence/a3-04-source-audit.txt).
-
-## A3-05 verification
-
-React public/authentication pages and guarded staff customer, room and booking screens with real Axios requests.
-
-Backend: [actual Maven result](evidence/a3-05-backend-build.txt). Source: [author/credential checks](evidence/a3-05-source-audit.txt).
-
-## A3-06 verification
-
-React customer profile, room selection, multi-room booking, own history and logout workflow.
-
-Source: [author/credential checks](evidence/a3-06-source-audit.txt).
+Initial-stage evidence remains historical: A3-01 rejected unsupported POST with 405 before security, while the final unauthenticated-write regression expects 401. PASS refers to each executed scenario/evidence, not every possible input or production-load condition. Text evidence is actual command output or an explicit browser-action record; screenshots/results are not fabricated.

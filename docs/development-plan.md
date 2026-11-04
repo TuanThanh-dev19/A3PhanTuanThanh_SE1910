@@ -11,8 +11,8 @@ Branch: `feature/a3-hotel`. Remote: `https://github.com/TuanThanh-dev19/A3PhanTu
 | A3-03 | Staff customer/room CRUD/search, room types, protect booking history on deletion; Postman CRUD/validation/authorization | DONE | 2026-11-04 | `379be0ae5e395e69d0bdf7579f90353c37d84d70` (pushed/verified) |
 | A3-04 | Transactional one/many-room bookings, unique IDs, server totals, overlap/date/status checks, own history, staff reservations/details; Postman valid/invalid/ownership checks | DONE | 2026-11-04 | `2d255e2d8dbcb9ff313c05c2a3bef8cf0a87fa5a` (pushed/verified) |
 | A3-05 | React public/auth/staff screens, Axios JWT and guards, real CRUD/search/details and session behavior; staff UI/API verification | DONE | 2026-11-04 | `7692bb03b4e4b2fc9f48b500a47dd11b10d7a0fc` (pushed/verified) |
-| A3-06 | Customer profile, room selection, multi-room booking, history/logout; register-to-history end-to-end with staff visibility | DONE | 2026-11-04 | SHA recorded in the next stage/follow-up commit |
-| A3-07 | Postman regression, FE/BE/permissions/history preservation, builds, README/docs consistency, secret review and clean tree | TODO | - | - |
+| A3-06 | Customer profile, room selection, multi-room booking, history/logout; register-to-history end-to-end with staff visibility | DONE | 2026-11-04 | `1ff22d48731dad0d1e8c0df44b007ef830e8917c` (pushed/verified) |
+| A3-07 | Postman regression, FE/BE/permissions/history preservation, builds, README/docs consistency, secret review and clean tree | IN PROGRESS | - | Final checks passed; awaiting commit/push |
 
 Required stage commit messages:
 
@@ -27,3 +27,5 @@ Required stage commit messages:
 Each stage requires functional checks, relevant tests/builds, actual evidence, documentation and a verified remote push before the next stage. This follow-up documentation commit records the actual A3-01 implementation SHA after its successful push, as allowed by the supplied plan. No history was rewritten.
 
 A3-01 closure: seven SQL Server integration tests passed, React production build passed, Postman executed two requests with six passing assertions, direct/proxied API data matched, and the browser rendered the three seeded rooms plus the offline error state. The original-derived SQL path and repeatable migration/seed were also tested in an isolated database. See [test matrix](test-matrix.md) for evidence. A3-01 remains verified; subsequent stage completion is recorded above.
+
+A3-07 verification: 29 backend tests, 3 frontend date tests, 57 Postman requests/74 assertions, format/production build, current SQL migration/seed checks and final browser checks passed. The final source audit and Git closure are recorded in test-matrix.md. The implementation SHA will be added after its successful push in a small documentation commit, as allowed by the supplied plan.

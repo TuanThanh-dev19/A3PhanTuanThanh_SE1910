@@ -104,4 +104,17 @@ class BookingApiTests extends ApiTestSupport {
         mvc.perform(get("/api/staff/bookings").header("Authorization","Bearer "+customerToken())).andExpect(status().isForbidden());
         mvc.perform(get("/api/bookings")).andExpect(status().isUnauthorized());
     }
+
+    @Test void failedStaffEditKeepsOriginalDetailsAndTotal() throws Exception {
+        String token=customerToken(), staff=staffToken();
+        int id=bookingId(book(token,new int[]{first},start,start.plusDays(2)).andExpect(status().isCreated()));
+        book(token,new int[]{second},start,start.plusDays(2)).andExpect(status().isCreated());
+        int customerId=bookings.findById(id).orElseThrow().getCustomer().getCustomerId();
+        mvc.perform(put("/api/staff/bookings/"+id).header("Authorization","Bearer "+staff).contentType("application/json")
+                .content(json.writeValueAsString(Map.of("customerId",customerId,"bookingStatus",1,
+                        "rooms",lines(new int[]{first,second},start,start.plusDays(2))))))
+                .andExpect(status().isConflict());
+        assertThat(details.findByBookingReservationBookingReservationIdOrderByRoomRoomIdAsc(id)).hasSize(1);
+        assertThat(bookings.findById(id).orElseThrow().getTotalPrice()).isEqualByComparingTo("1000000");
+    }
 }

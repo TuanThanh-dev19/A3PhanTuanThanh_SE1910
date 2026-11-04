@@ -8,7 +8,8 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "RoomInformation", schema = "dbo")
+@Table(name = "RoomInformation", schema = "dbo",
+        uniqueConstraints = @UniqueConstraint(name = "UQ_RoomInformation_RoomNumber", columnNames = "RoomNumber"))
 public class RoomInformation {
 
     @Id

@@ -1,0 +1,9 @@
+Actual browser verification on 2026-11-04, Asia/Bangkok, resumed at A3-07.
+PASS: fresh customer sign-in loaded persisted booking #39 with rooms 101/102, dates 2026-12-19 to 2026-12-21 and total 2100000.
+PASS: temporarily deactivating only the dedicated synthetic UI customer caused its next GET /profile to return 401; Axios cleared the session and the protected route returned to sign-in.
+PASS: the test customer was restored to status 1; sign-in and the original two-detail history succeeded again.
+PASS: a fresh configured staff session searched that customer and displayed the same booking #39, dates, details and total on the final build.
+PASS: final customer/staff browser error-log inspections returned no JavaScript console errors.
+Screenshots: a3-07-customer-final.jpg, a3-07-staff-final.jpg, a3-07-session-rejected.jpg.
+The complete registration/profile/booking/logout workflow and staff CRUD browser actions remain recorded in a3-05-ui.txt and a3-06-ui.txt.
+Credentials and JWTs are excluded. Screenshots contain only synthetic local customer data.

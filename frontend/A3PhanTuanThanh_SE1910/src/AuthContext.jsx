@@ -11,11 +11,28 @@ export function AuthProvider({ children }) {
   }, []);
   useEffect(() => {
     if (!session) return;
-    const timer = setTimeout(() => { clearSession(); setSession(null); }, Math.max(0, session.expiresAt - Date.now()));
+    const timer = setTimeout(
+      () => {
+        clearSession();
+        setSession(null);
+      },
+      Math.max(0, session.expiresAt - Date.now()),
+    );
     return () => clearTimeout(timer);
   }, [session]);
-  function login(data) { setSession(saveSession(data)); }
-  function logout() { clearSession(); setSession(null); }
-  return <AuthContext.Provider value={{ session, login, logout, updateName: (name) => setSession(updateSessionName(name)) }}>{children}</AuthContext.Provider>;
+  function login(data) {
+    setSession(saveSession(data));
+  }
+  function logout() {
+    clearSession();
+    setSession(null);
+  }
+  return (
+    <AuthContext.Provider
+      value={{ session, login, logout, updateName: (name) => setSession(updateSessionName(name)) }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 export const useAuth = () => useContext(AuthContext);

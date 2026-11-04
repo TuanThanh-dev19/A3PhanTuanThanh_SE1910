@@ -2,70 +2,47 @@
 
 # Design
 
-## Implemented foundation
-
 ```mermaid
 flowchart LR
-    React[React catalog preview] --> Axios[Axios /api]
-    Axios --> Proxy[Vite proxy :5173 to :8081]
-    Proxy --> Controller[RoomCatalogController]
-    Controller --> Service[RoomCatalogService]
+    React[React role pages] --> Axios[Axios /api + bearer JWT]
+    Axios --> Vite[Vite proxy :5173 to :8081]
+    Vite --> Security[Spring Security JWT filter and roles]
+    Security --> Controller[REST controllers + validated DTOs]
+    Controller --> Service[Transactional services]
     Service --> Repository[Spring Data JPA repositories]
     Repository --> SQL[SQL Server]
 ```
 
-The Maven backend remains at the repository root. The React project is `frontend/A3PhanTuanThanh_SE1910`. Constructor injection and read-only service transactions keep DTO mapping inside the persistence context. Controllers return DTO records, not entities; no customer data/password is exposed. Database access errors return HTTP 503 with a generic English message.
+## Persistence and schema
 
-| Entity/table | Key and relationships |
+| Entity | Key and relationships |
 | --- | --- |
-| `RoomType` | Identity `RoomTypeID`; referenced by rooms |
-| `RoomInformation` | Identity `RoomID`; required `RoomTypeID` FK |
-| `Customer` | Identity `CustomerID`; unique email; password length 255 |
-| `BookingReservation` | Sequence-generated `BookingReservationID`; required `CustomerID` FK |
-| `BookingDetail` | Embedded `(BookingReservationID, RoomID)` PK, `@MapsId` to reservation/room; start/end dates and actual price |
+| RoomType | Identity RoomTypeID; referenced by rooms |
+| RoomInformation | Identity RoomID; required RoomTypeID; unique RoomNumber |
+| Customer | Identity CustomerID; unique email; password nvarchar(255) |
+| BookingReservation | dbo.BookingReservationSequence; required CustomerID |
+| BookingDetail | Embedded (BookingReservationID, RoomID) PK; @MapsId reservation/room links |
 
-SQL `money` maps to `BigDecimal`, `date` to `LocalDate`, nullable `tinyint` to `Short` with an explicit JDBC tinyint mapping, and Unicode fields to nationalized strings. Relationships are unidirectional many-to-one with lazy loading and no remove cascade. All four database FKs use `NO ACTION` after migration.
+Money maps to BigDecimal, date to LocalDate, tinyint status to Short with JDBC tinyint mapping, and Unicode text to nationalized strings. Lazy unidirectional many-to-one relationships have no remove cascades. The service creates DTOs inside transactions, avoiding entity serialization/lazy errors. Four SQL foreign keys use NO ACTION.
 
-`database/02-original-schema.sql` retains the provided schema (including customer identity seed 3) under the A3 database name. `03-a3-migration.sql` widens passwords, creates a sequence if needed, and replaces cascades. `04-seed.sql` inserts two types/three rooms without credentials and can be rerun. JPA bootstrap on a new database uses provider-default identity seed 1; application behavior never assumes a particular customer ID. Only one of the two schema creation paths should run per database.
+Script 01 creates the database; script 02 preserves the original schema under its A3 name; script 03 widens passwords, provides the sequence, replaces cascades and adds unique room numbers; script 04 seeds two types/three rooms. Choose JPA bootstrap or original-derived SQL schema creation, then apply migration/seed. Normal ddl-auto is validate. Original SQL customer identity starts at 3; JPA defaults to 1; no behavior assumes a customer identity value.
 
-Normal startup uses `ddl-auto=validate`; the explicit `bootstrap` profile uses `update` to satisfy JPA schema creation on an empty database. Scripts are executed manually. No automatic schema reset occurs. A migration on existing bookings without a sequence stops for review rather than guessing an ID.
+## Authentication and API contracts
 
-## API scope
+SecurityConfig uses Spring Security's BearerTokenAuthenticationFilter and Nimbus HS256 encoder/decoder, issuer fuminihotel, expiry validation and stateless sessions. AuthService checks BCrypt customer hashes or the configured staff password hash and issues a one-hour JWT. Subject is customer ID or staff; role maps to ROLE_CUSTOMER/ROLE_STAFF. Staff credentials/signing key come from configuration, never a Staff table. Customer services recheck active account status.
 
-Implemented: public `GET /api/rooms` and `GET /api/room-types`. No writes or authentication endpoints exist yet. Bootstrap endpoints support actual room/room-type queries and a minimal frontend preview.
+Public GET /api/rooms, /api/room-types and POST /api/auth/register, /api/auth/login. Customer-only GET/PUT /api/profile, GET/POST /api/bookings, GET /api/bookings/{id}. Staff CRUD/search routes are /api/staff/customers, /api/staff/rooms, /api/staff/bookings, with item /{id} and booking PATCH /{id}/status. See [README](../README.md) for methods/bodies.
 
-Planned APIs: customer registration/login, own profile/history/bookings, staff customer/room CRUD/search, staff reservations/details. Route contracts will be finalized in the relevant stage and recorded here.
+Profile validation requires name (50 max), telephone (7-12 allowed characters), email (50 max), past birthday; passwords require 8-64 characters and at most 72 UTF-8 bytes. Staff customer update may omit password. DTOs exclude hashes. Field errors return 400, missing/invalid session 401, wrong role 403, missing item 404, conflicts 409 and database unavailability 503, using English messages.
 
-## Authentication and role security (implemented A3-02)
+## Transactions and history
 
-`config/SecurityConfig.java` uses Spring Security's BearerTokenAuthenticationFilter with Nimbus HS256 validation, issuer `fuminihotel`, expiration checking and stateless sessions. JWT subject is the customer ID or `staff`; the `role` claim maps to `ROLE_CUSTOMER`/`ROLE_STAFF`. Tokens expire after one hour. Keys and configured staff credentials come from environment/ignored local properties. Staff password is BCrypt-encoded in memory; customer passwords are BCrypt hashes in SQL Server.
+BookingService validates distinct room IDs and stay dates before writing. It locks the edited reservation and affected room rows in ascending room ID order, checks active rooms and active-reservation overlaps, snapshots current nightly prices into ActualPrice, and calculates TotalPrice with BigDecimal. Failed creates/edits roll back. Staff PUT intentionally manages the detail set and recalculates totals. Cancellation retains all details/prices; reactivation checks availability. Concurrent same-room requests were tested: one succeeds and one receives 409.
 
-Public: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/rooms`, GET `/api/room-types`. Customer only: GET/PUT `/api/profile`. Staff path `/api/staff/**` is reserved for STAFF. Other routes are denied. Staff customer/room APIs were added in A3-03 (see below).
+StaffManagementService locks room writes/deletion. Existing detail references cause room status 2; unused rooms are deleted. Customers with history cannot be deleted. SQL FKs back these checks. Booking history ownership uses JWT subject, not a request customer ID.
 
-Registration body: `{profile: {customerFullName, telephone, emailAddress, customerBirthday}, password}`. Login body: `{email, password}`. DTO validation enforces lengths, email, past birthday and telephone shape. Passwords require 8-64 characters and at most 72 UTF-8 bytes. Duplicate/reserved emails return 409. Validation returns 400 plus fieldErrors; absent/invalid token returns 401, wrong role 403. Profile DTOs exclude passwords.
+## React
 
-Booking transactions/overlap checks are implemented in A3-04 below. The existing FKs already prevent cascade loss.
+App.jsx/Protected guard staff and customer routes. AuthContext/session.js keep token, role, display name and expiry in sessionStorage; refresh preserves the tab session, logout/expiry/401 clears it. Passwords are not stored. Profile changes update the display name without extending token expiry.
 
-## Staff management (implemented A3-03)
-
-`StaffManagementController` -> `StaffManagementService` -> repositories. STAFF can GET/list/search, POST, PUT and DELETE `/api/staff/customers` and `/api/staff/rooms` (item operations use `/{id}`). Lists accept `?search=` (maximum 100 characters). Customer search matches name/email; room search matches number/description. GET `/api/room-types` supplies options.
-
-Staff customer bodies contain validated `profile`, `customerStatus` (1 active/2 inactive), and a password required on create, optional on update. DTOs never include password hashes. Referenced customers cannot be deleted (409); staff can deactivate them. Room bodies validate number/description/capacity/type/status/positive money up to 1,000,000,000 with at most four decimal places. Room numbers are checked for duplicates in the service. Room writes/deletion acquire a pessimistic row lock. A referenced room is deactivated (status 2) by DELETE; an unused room is physically deleted. Foreign keys remain a second history safeguard.
-
-## Booking APIs and rules (implemented A3-04)
-
-Customer: POST `/api/bookings`, GET `/api/bookings`, GET `/api/bookings/{id}`. Identity comes only from the JWT subject; another customer's item returns 404. Staff: GET/search and POST `/api/staff/bookings`, GET/PUT/DELETE `/api/staff/bookings/{id}`, PATCH `/api/staff/bookings/{id}/status`. Staff search matches ID/customer name/email. DELETE is cancellation (status 2), preserving the reservation and details; status 1 is active.
-
-Request details contain only roomId/startDate/endDate. One booking may contain 1-20 distinct rooms. This limit is an implementation decision for an individual assignment. Staff requests also contain customerId and bookingStatus. Dates must start today or later and checkout must be after check-in; checkout year is at most 9999. Half-open ranges `[start,end)` allow adjacent stays. Inactive rooms and overlapping active reservations return 409. Cancelled reservations do not block dates.
-
-BookingService locks the reservation for staff edits and every affected room in ascending ID order; locks remain held for the transaction. All rooms are checked before any booking/detail write. ActualPrice snapshots the current nightly price; TotalPrice sums nightly price times nights using BigDecimal. Client totals are ignored. Staff PUT explicitly manages the room-detail set and recomputes totals; failed edits roll back. Cancellation preserves detail rows and prices. The staff interface is implemented in A3-05; the customer interface is implemented A3-06.
-
-## React public/auth/staff screens (implemented A3-05)
-
-BrowserRouter in App.jsx maps public rooms/login/register and STAFF-only /staff/customers, /staff/rooms, /staff/bookings. Protected handles missing sessions and role mismatch; backend authorization remains authoritative. AuthContext and session.js keep only token/role/name/expiry in sessionStorage. Axios attaches the token; a 401 clears session and protected routes return to sign-in. A timer expires the session after one hour. Passwords are never saved to browser storage.
-
-Staff forms call real REST CRUD/search APIs and render server errors. ProfileFields is shared by customer registration and staff customer editing. BookingEditor supports 1-20 room/date rows, duplicate/date checks and an estimate; the server returns the final total. BookingDetails renders preserved nightly prices/subtotals. Staff can create/edit reservations, view details, cancel/reactivate, and manage room/customer status. Each select has an explicit accessible name where option text otherwise made labels ambiguous.
-
-## Customer React workflow (implemented A3-06)
-
-CUSTOMER-only /profile, /book and /history are protected in App.jsx. ProfilePage GETs and PUTs /profile using shared ProfileFields, then updates the stored display name without extending token expiry. CustomerBooking loads active rooms and uses BookingEditor for one or many room/date lines; a successful POST /bookings navigates to history with the new reservation selected. HistoryPage loads only /bookings for the authenticated customer, supports refresh and renders BookingDetails. Logout clears the session and guards redirect protected routes to login. Client checks supplement server validation and never replace ownership/availability checks.
+Pages call actual APIs through api.js. ProfileFields, BookingEditor, BookingDetails and Notice share small UI responsibilities. BookingEditor supports multiple room/date rows, duplicate/date checks and an estimate; the server returns the authoritative total. Explicit select labels and native date input synchronization support browser use. localDate uses the local calendar (tested for Bangkok midnight/year/leap-day boundaries). Staff list request counters prevent an older response from replacing a newer search.

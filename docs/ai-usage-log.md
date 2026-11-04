@@ -13,3 +13,5 @@ Author headers were applied to created/modified source/config files that support
 | 2026-11-04 / A3-03 | OpenAI Codex | Staff customer/room CRUD and search, room-type lookup, referenced-room deactivation and customer-history protection. | Agent executed the stage-specific tests and inspected actual output/evidence. No human review is claimed. See test-matrix.md and evidence/a3-03-*. |
 
 | 2026-11-04 / A3-04 | OpenAI Codex | Transactional multi-room bookings, ownership, availability/date checks, server totals and staff reservation/detail management. | Agent executed the stage-specific tests and inspected actual output/evidence. No human review is claimed. See test-matrix.md and evidence/a3-04-*. |
+
+| 2026-11-04 / A3-05 | OpenAI Codex | React public/authentication pages and guarded staff customer, room and booking screens with real Axios requests. | Agent executed the stage-specific tests and inspected actual output/evidence. No human review is claimed. See test-matrix.md and evidence/a3-05-*. |

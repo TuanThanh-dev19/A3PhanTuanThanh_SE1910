@@ -17,3 +17,35 @@ article h3 { font-size: 1.5rem; }
 .error { color: #962f25; background: #fff0ee; padding: 16px; }
 footer { margin-top: 36px; color: #536e75; font-size: 0.85rem; }
 @media (max-width: 600px) { main { padding: 28px 18px; } }
+
+nav { max-width: 1320px; padding: 20px 28px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid #d1dcd8; flex-wrap: wrap; }
+a { color: #246047; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.brand { font-size: 1.2rem; font-weight: 700; }
+.nav-links, .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.nav-links a { padding: 5px; }
+.nav-links a.active { font-weight: 700; text-decoration: underline; }
+main { max-width: 1320px; padding-top: 32px; }
+.hero { max-width: 800px; }
+.panel, .auth-panel { background: white; border: 1px solid #d1dcd8; border-radius: 10px; padding: 24px; margin: 24px 0; }
+.auth-panel { max-width: 520px; margin: 30px auto; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+label { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; font-size: .9rem; font-weight: 600; }
+input, select { font: inherit; font-weight: 400; padding: 10px 12px; border: 1px solid #a6bab3; border-radius: 6px; width: 100%; background: white; color: #17313b; min-height: 43px; }
+input:focus, select:focus, button:focus-visible, a:focus-visible { outline: 3px solid #9cc9b4; outline-offset: 2px; }
+button { font: inherit; background: #276955; color: white; border: 1px solid #276955; padding: 9px 15px; border-radius: 6px; cursor: pointer; }
+button.secondary { color: #245d4b; background: #f2f7f4; border-color: #bdd1c8; }
+button.danger { color: #962f25; background: #fff0ee; border-color: #e3b9b3; }
+button:disabled { opacity: .6; cursor: wait; }
+.success { padding: 14px; border-radius: 6px; background: #e3f2e9; color: #245d4b; }
+.error { border-radius: 6px; white-space: pre-wrap; }
+.search { display: flex; align-items: end; gap: 12px; margin: 20px 0; }
+.search label { margin: 0; flex: 1; max-width: 540px; }
+.table-scroll { overflow-x: auto; margin: 20px 0; }
+table { border-collapse: collapse; width: 100%; background: white; font-size: .9rem; }
+th, td { border-bottom: 1px solid #d1dcd8; padding: 12px; text-align: left; vertical-align: top; }
+th { background: #e7efeb; white-space: nowrap; }
+td.actions { min-width: 180px; }
+fieldset { border: 1px solid #c5d7ce; border-radius: 6px; padding: 16px; margin: 16px 0; }
+legend { padding: 0 8px; font-weight: 700; }
+@media (max-width: 600px) { nav { padding: 18px; } .panel { padding: 18px; } .search { flex-wrap: wrap; } }

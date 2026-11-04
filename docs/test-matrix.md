@@ -33,7 +33,7 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A04-02 | Customer | Missing room, inactive room, invalid dates and overlap | Clear rejection without partial booking | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
 | A04-03 | Customer | Own history versus another customer's booking | Own records only | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
 | A04-04 | Staff | Manage reservations/details with valid and invalid edits | Safe updates and preserved history | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
-| A05-01 | Staff | React login, guarded routes, CRUD/search/details, refresh | Real API workflow and clear errors | Not implemented | NOT RUN | - |
+| A05-01 | Staff | React login, guarded routes, CRUD/search/details, refresh | Real API workflow and clear errors | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-05-ui.txt) |
 | A06-01 | Customer | Register -> login -> profile -> select rooms -> booking -> history -> logout | Real end-to-end workflow; staff sees new booking | Not implemented | NOT RUN | - |
 | A07-01 | All | Full Postman/React regression and permissions | All final requirements verified | Only A3-01 subset executed | NOT RUN | - |
 
@@ -56,3 +56,9 @@ Backend: [actual Maven result](evidence/a3-03-backend-build.txt). API: [actual P
 Transactional multi-room bookings, ownership, availability/date checks, server totals and staff reservation/detail management.
 
 Backend: [actual Maven result](evidence/a3-04-backend-build.txt). API: [actual Postman result](evidence/a3-04-postman.txt). Source: [author/credential checks](evidence/a3-04-source-audit.txt).
+
+## A3-05 verification
+
+React public/authentication pages and guarded staff customer, room and booking screens with real Axios requests.
+
+Backend: [actual Maven result](evidence/a3-05-backend-build.txt). Source: [author/credential checks](evidence/a3-05-source-audit.txt).

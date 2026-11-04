@@ -14,7 +14,7 @@ Database, Spring project and React project: `A3PhanTuanThanh_SE1910`. Author: Ph
 | --- | --- | --- |
 | Guest | View room information without authentication | Read-only catalog preview implemented |
 | Customer | Register, email/password JWT login, own profile, create one/many-room booking, own booking history | Authentication/profile APIs implemented; Booking/profile/authentication APIs implemented; customer UI planned A3-06 |
-| Staff | Login from application configuration; manage customers, rooms, reservations and details; CRUD/search | Configured login/customer-room APIs implemented; Booking/customer-room APIs implemented; staff UI planned A3-05 |
+| Staff | Login from application configuration; manage customers, rooms, reservations and details; CRUD/search | Configured login/customer-room APIs implemented; Booking/customer-room APIs implemented; staff screens implemented A3-05 |
 
 A room may be hard-deleted only if no booking detail references it. Otherwise change its status and preserve history. A room belongs to one room type; a customer has many reservations; each reservation has one or more details, with one room per detail. `BookingDetail` has composite PK `(BookingReservationID, RoomID)`.
 
@@ -34,4 +34,4 @@ A room may be hard-deleted only if no booking detail references it. Otherwise ch
 | Development networking | Local decision | Loopback backend 8081; Vite 5173 with `/api` proxy |
 | Secrets | User requirement | Environment/ignored local properties, placeholders only in Git |
 
-Deliver exactly one stage at a time with real checks, updated docs/evidence, English commit and a normal GitHub push. Never mark unexecuted cases PASS. A3-02 authentication/profile is implemented; A3-03 staff customer/room APIs are implemented; A3-04 booking APIs are implemented; A3-05 through A3-07 remain pending.
+Deliver exactly one stage at a time with real checks, updated docs/evidence, English commit and a normal GitHub push. Never mark unexecuted cases PASS. A3-02 authentication/profile is implemented; A3-03 staff customer/room APIs are implemented; A3-04 booking APIs are implemented; A3-05 public/auth/staff screens are implemented; A3-06/A3-07 remain pending.

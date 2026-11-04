@@ -1,0 +1,12 @@
+Actual browser verification on 2026-11-04, localhost:5173 against SQL Server-backed APIs.
+PASS: anonymous /staff/rooms navigated to sign-in with a clear message.
+PASS: incorrect configured-staff password showed Invalid email or password; correct credentials opened staff customers.
+PASS: staff created a customer, searched by email, edited its name and saw Customer updated.
+PASS: reload preserved the staff session and protected page access.
+PASS: staff created a room at 610000/night, searched it, edited to 620000/night and saw the persisted value.
+PASS: duplicate room 101 displayed the server conflict message without creating another record.
+PASS: staff created booking #28, edited it to two rooms and saw the server total 1520000.
+PASS: cancelling booking #28 retained both details and showed Cancelled with the same total.
+PASS: browser error log inspection returned no JavaScript console errors at the end of these checks.
+Screenshots: a3-05-staff-customers.jpg, a3-05-staff-rooms.jpg, a3-05-staff-bookings.jpg.
+Fixtures use generated local-only test credentials, which are excluded from evidence.

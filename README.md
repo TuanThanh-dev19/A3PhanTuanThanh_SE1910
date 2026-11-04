@@ -4,7 +4,7 @@
 
 SBA301 Assignment 03 by Phan Tuan Thanh (CE190595). Project/database name: `A3PhanTuanThanh_SE1910`, confirmed by the supplied repository and existing Spring project. The class code is SE1910.
 
-A3-02 includes JWT customer/staff authentication and customer profile APIs, alongside the SQL Server/JPA foundation and React catalog preview. Staff/booking APIs and role screens are planned in subsequent stages.
+A3-02 includes JWT customer/staff authentication and customer profile APIs, alongside the SQL Server/JPA foundation and React catalog preview. Staff/booking APIs and staff React screens are implemented. Customer booking/profile/history screens follow in A3-06.
 
 ## Requirements
 
@@ -85,7 +85,7 @@ Seven integration tests use the actual configured SQL Server, not H2. Test write
 | GET | `/api/rooms` | Public room DTOs including room-type name and nightly price |
 | GET | `/api/room-types` | Public room-type DTOs for bootstrap verification |
 
-A3-02 adds public POST /api/auth/register and /api/auth/login, and customer-only GET/PUT /api/profile. Login returns token, role, name and expiresIn. Send Authorization: Bearer <token> to protected APIs. The catalog preview is not the complete A3-05 public/staff UI.
+A3-02 adds public POST /api/auth/register and /api/auth/login, and customer-only GET/PUT /api/profile. Login returns token, role, name and expiresIn. Send Authorization: Bearer <token> to protected APIs. React now includes public rooms, login/register and guarded staff customer/room/booking pages. Session storage preserves the one-hour JWT across refreshes within the tab.
 
 ## Documentation
 

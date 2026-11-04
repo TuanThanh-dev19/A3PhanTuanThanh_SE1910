@@ -1,0 +1,9 @@
+Command: mvn -B verify (actual SQL Server)
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.38 s -- in fpt.edu.a3phantuanthanh_se1910.A3PhanTuanThanhSe1910ApplicationTests
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.880 s -- in fpt.edu.a3phantuanthanh_se1910.AuthApiTests
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.826 s -- in fpt.edu.a3phantuanthanh_se1910.BookingApiTests
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.015 s -- in fpt.edu.a3phantuanthanh_se1910.StaffManagementApiTests
+[INFO] Tests run: 25, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  24.597 s
+[INFO] Finished at: 2026-11-04T17:10:37+07:00

@@ -34,7 +34,7 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A04-03 | Customer | Own history versus another customer's booking | Own records only | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
 | A04-04 | Staff | Manage reservations/details with valid and invalid edits | Safe updates and preserved history | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-04-postman.txt) |
 | A05-01 | Staff | React login, guarded routes, CRUD/search/details, refresh | Real API workflow and clear errors | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-05-ui.txt) |
-| A06-01 | Customer | Register -> login -> profile -> select rooms -> booking -> history -> logout | Real end-to-end workflow; staff sees new booking | Not implemented | NOT RUN | - |
+| A06-01 | Customer | Register -> login -> profile -> select rooms -> booking -> history -> logout | Real end-to-end workflow; staff sees new booking | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-06-ui.txt) |
 | A07-01 | All | Full Postman/React regression and permissions | All final requirements verified | Only A3-01 subset executed | NOT RUN | - |
 
 A01-09 verifies database history protection, not the later staff soft-delete business rule. Postman A3-01 ran two GET requests with six passing assertions; auth/CRUD/booking Postman checks belong to later stages. Evidence text contains actual concise command output/excerpts, not reconstructed test results. Screenshots capture the browser's real rendered page.
@@ -62,3 +62,9 @@ Backend: [actual Maven result](evidence/a3-04-backend-build.txt). API: [actual P
 React public/authentication pages and guarded staff customer, room and booking screens with real Axios requests.
 
 Backend: [actual Maven result](evidence/a3-05-backend-build.txt). Source: [author/credential checks](evidence/a3-05-source-audit.txt).
+
+## A3-06 verification
+
+React customer profile, room selection, multi-room booking, own history and logout workflow.
+
+Source: [author/credential checks](evidence/a3-06-source-audit.txt).

@@ -1,0 +1,13 @@
+Actual browser verification on 2026-11-04, localhost:5173 -> Axios -> Spring Boot -> SQL Server.
+PASS: registered a new customer with generated credentials and signed in through the real login page.
+PASS: profile loaded persisted birthday/contact data; edited name and header both updated after Save profile.
+PASS: customer entering /staff/rooms saw Access restricted.
+PASS: new customer initially saw an empty own booking history.
+PASS: selecting the same room twice showed Select each room only once before submission.
+PASS: customer booked rooms 101 and 102 for 2026-12-19 to 2026-12-21; booking #39 was created.
+PASS: history showed both room details and server total 2100000; refresh preserved the customer session and history.
+PASS: attempting room 101 on the same dates showed the real overlap error from the API.
+PASS: sign-out removed customer access; opening /history redirected to sign-in.
+PASS: configured staff signed in, searched the new customer's email and viewed booking #39 with the same rooms, dates and total.
+Screenshots: a3-06-customer-profile.jpg, a3-06-customer-history.jpg, a3-06-overlap-error.jpg, a3-06-staff-sees-booking.jpg.
+Credentials and JWTs are not included. Browser tests used synthetic local customer data.

@@ -1,6 +1,6 @@
 // Author: Phan Tuan Thanh - CE190595
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getSession, saveSession, clearSession } from './session.js';
+import { getSession, saveSession, clearSession, updateSessionName } from './session.js';
 const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(getSession);
@@ -16,6 +16,6 @@ export function AuthProvider({ children }) {
   }, [session]);
   function login(data) { setSession(saveSession(data)); }
   function logout() { clearSession(); setSession(null); }
-  return <AuthContext.Provider value={{ session, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ session, login, logout, updateName: (name) => setSession(updateSessionName(name)) }}>{children}</AuthContext.Provider>;
 }
 export const useAuth = () => useContext(AuthContext);

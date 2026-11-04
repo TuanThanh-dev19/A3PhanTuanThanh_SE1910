@@ -14,3 +14,10 @@ export function saveSession(data) {
   return session;
 }
 export function clearSession() { sessionStorage.removeItem(key); }
+export function updateSessionName(name) {
+  const session = getSession();
+  if (!session) return null;
+  const updated = { ...session, name };
+  sessionStorage.setItem(key, JSON.stringify(updated));
+  return updated;
+}

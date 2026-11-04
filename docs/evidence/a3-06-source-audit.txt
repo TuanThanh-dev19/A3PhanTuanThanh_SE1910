@@ -1,0 +1,1 @@
+Actual source audit: required author headers present; local database/staff/JWT credentials and common key/token patterns absent from Git candidates. Ignored local files excluded.

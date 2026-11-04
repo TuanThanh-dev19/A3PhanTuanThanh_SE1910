@@ -20,11 +20,11 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A01-12 | Guest | React when A3 backend is offline | Clear English error without fake room data | Browser displayed 'Unable to load rooms. Please try again later.' | PASS | [Error screenshot](evidence/a3-01-api-unavailable.jpg) |
 | A01-13 | Developer | Maven verify / React production build | Relevant tests/builds pass | Seven tests, zero failures/errors/skips; Vite production build succeeded | PASS | [Maven](evidence/a3-01-backend-build.txt), [Vite](evidence/a3-01-frontend-build.txt) |
 | A01-14 | Developer | Author headers, secrets and ignored outputs | Headers where supported; credentials/build outputs excluded | Headers/JSON/docs links checked; local password and common key/token patterns absent; generated output ignored | PASS | [Source audit](evidence/a3-01-source-audit.txt) |
-| A02-01 | Customer | Register/login with valid email/password | BCrypt storage and valid JWT | Not implemented | NOT RUN | - |
-| A02-02 | Customer | Duplicate email, wrong password, invalid registration | Clear validation/authentication error | Not implemented | NOT RUN | - |
-| A02-03 | Guest/Customer | Missing/expired/invalid token and wrong role | Protected API rejects request with appropriate status | Security/JWT not implemented | NOT RUN | - |
-| A02-04 | Staff | Login using configured staff account | STAFF JWT, no staff table | Not implemented | NOT RUN | - |
-| A02-05 | Customer | Read/update own profile without password disclosure | Own profile only, valid input, safe DTO | Not implemented | NOT RUN | - |
+| A02-01 | Customer | Register/login with valid email/password | BCrypt storage and valid JWT | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
+| A02-02 | Customer | Duplicate email, wrong password, invalid registration | Clear validation/authentication error | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
+| A02-03 | Guest/Customer | Missing/expired/invalid token and wrong role | Protected API rejects request with appropriate status | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
+| A02-04 | Staff | Login using configured staff account | STAFF JWT, no staff table | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
+| A02-05 | Customer | Read/update own profile without password disclosure | Own profile only, valid input, safe DTO | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
 | A03-01 | Staff | Customer and room CRUD/search, room-type selection | Persist/search real records | Not implemented | NOT RUN | - |
 | A03-02 | Guest/Customer | Attempt staff APIs | Denied | Staff APIs not implemented | NOT RUN | - |
 | A03-03 | Staff | Delete unused room versus previously booked room | Hard delete unused room; status change for referenced room | Service-level rule not implemented; only FK protection tested in A01-09 | NOT RUN | - |
@@ -38,3 +38,9 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A07-01 | All | Full Postman/React regression and permissions | All final requirements verified | Only A3-01 subset executed | NOT RUN | - |
 
 A01-09 verifies database history protection, not the later staff soft-delete business rule. Postman A3-01 ran two GET requests with six passing assertions; auth/CRUD/booking Postman checks belong to later stages. Evidence text contains actual concise command output/excerpts, not reconstructed test results. Screenshots capture the browser's real rendered page.
+
+## A3-02 verification
+
+JWT authentication, BCrypt registration, configured staff login, role authorization and own profile APIs.
+
+Backend: [actual Maven result](evidence/a3-02-backend-build.txt). API: [actual Postman result](evidence/a3-02-postman.txt). Source: [author/credential checks](evidence/a3-02-source-audit.txt).

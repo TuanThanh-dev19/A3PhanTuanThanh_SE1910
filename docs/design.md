@@ -36,10 +36,12 @@ Implemented: public `GET /api/rooms` and `GET /api/room-types`. No writes or aut
 
 Planned APIs: customer registration/login, own profile/history/bookings, staff customer/room CRUD/search, staff reservations/details. Route contracts will be finalized in the relevant stage and recorded here.
 
-## Planned security and booking behavior
+## Authentication and role security (implemented A3-02)
 
-A3-02 will add Spring Security, BCrypt and JWT with `STAFF`/`CUSTOMER` roles. Staff credentials come through application configuration/environment, not a staff table. JWT requests will flow through a filter and role rules before controllers. Customer APIs must derive ownership from authenticated identity.
+`config/SecurityConfig.java` uses Spring Security's BearerTokenAuthenticationFilter with Nimbus HS256 validation, issuer `fuminihotel`, expiration checking and stateless sessions. JWT subject is the customer ID or `staff`; the `role` claim maps to `ROLE_CUSTOMER`/`ROLE_STAFF`. Tokens expire after one hour. Keys and configured staff credentials come from environment/ignored local properties. Staff password is BCrypt-encoded in memory; customer passwords are BCrypt hashes in SQL Server.
 
-A3-03 will soft-disable referenced rooms and reject deletion of customers with reservations. A3-04 will create all booking details in one transaction, validate rooms/dates/status/overlap and calculate totals using `BigDecimal`. These service rules and overlap handling are not implemented in A3-01. Database constraints already prevent cascading history loss.
+Public: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/rooms`, GET `/api/room-types`. Customer only: GET/PUT `/api/profile`. Staff path `/api/staff/**` is reserved for STAFF. Other routes are denied. No staff/customer mutation APIs beyond profile exist yet.
 
-Version reference: [Spring Boot 3.5 requirements](https://docs.spring.io/spring-boot/3.5/system-requirements.html). Schema modes follow [Spring Boot database initialization](https://docs.spring.io/spring-boot/3.5/how-to/data-initialization.html).
+Registration body: `{profile: {customerFullName, telephone, emailAddress, customerBirthday}, password}`. Login body: `{email, password}`. DTO validation enforces lengths, email, past birthday and telephone shape. Passwords require 8-64 characters and at most 72 UTF-8 bytes. Duplicate/reserved emails return 409. Validation returns 400 plus fieldErrors; absent/invalid token returns 401, wrong role 403. Profile DTOs exclude passwords.
+
+Staff CRUD/history-safe service behavior remains planned for A3-03; booking transactions/overlap checks remain planned for A3-04. The existing FKs already prevent cascade loss.

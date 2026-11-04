@@ -7,7 +7,7 @@ Branch: `feature/a3-hotel`. Remote: `https://github.com/TuanThanh-dev19/A3PhanTu
 | Stage | Work and completion criteria | Status | Completed | Commit |
 | --- | --- | --- | --- | --- |
 | A3-01 | Spring Boot 3/SQL Server + React/Axios, five entities/composite key, A3 SQL/migration/seed, safe local config, seven docs; actual backend/SQL queries and frontend startup verified | DONE | 2026-11-04 | `8742d60d8c3689105bcd1c1061396d8f9e996fa5` (remote verified) |
-| A3-02 | JWT customer registration/login, configured staff login, BCrypt, role security, public rooms, own profile; Postman success/failure/role checks | TODO | - | - |
+| A3-02 | JWT customer registration/login, configured staff login, BCrypt, role security, public rooms, own profile; Postman success/failure/role checks | DONE | 2026-11-04 | SHA recorded in the next stage/follow-up commit |
 | A3-03 | Staff customer/room CRUD/search, room types, protect booking history on deletion; Postman CRUD/validation/authorization | TODO | - | - |
 | A3-04 | Transactional one/many-room bookings, unique IDs, server totals, overlap/date/status checks, own history, staff reservations/details; Postman valid/invalid/ownership checks | TODO | - | - |
 | A3-05 | React public/auth/staff screens, Axios JWT and guards, real CRUD/search/details and session behavior; staff UI/API verification | TODO | - | - |
@@ -26,4 +26,4 @@ Required stage commit messages:
 
 Each stage requires functional checks, relevant tests/builds, actual evidence, documentation and a verified remote push before the next stage. This follow-up documentation commit records the actual A3-01 implementation SHA after its successful push, as allowed by the supplied plan. No history was rewritten.
 
-A3-01 closure: seven SQL Server integration tests passed, React production build passed, Postman executed two requests with six passing assertions, direct/proxied API data matched, and the browser rendered the three seeded rooms plus the offline error state. The original-derived SQL path and repeatable migration/seed were also tested in an isolated database. See [test matrix](test-matrix.md) for evidence. No A3-01 blocker remains; A3-02 through A3-07 are TODO.
+A3-01 closure: seven SQL Server integration tests passed, React production build passed, Postman executed two requests with six passing assertions, direct/proxied API data matched, and the browser rendered the three seeded rooms plus the offline error state. The original-derived SQL path and repeatable migration/seed were also tested in an isolated database. See [test matrix](test-matrix.md) for evidence. A3-01 remains verified; subsequent stage completion is recorded above.

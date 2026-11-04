@@ -20,14 +20,12 @@ All backend paths below begin at `src/main/java/fpt/edu/a3phantuanthanh_se1910/`
 
 `src/test/java/fpt/edu/a3phantuanthanh_se1910/A3PhanTuanThanhSe1910ApplicationTests.java` exercises the real SQL Server and rolls back test rows. `scripts/verify-a3-01.ps1` compares direct API responses with frontend-proxied data.
 
-## Registration/login/JWT (planned A3-02)
+## Registration/login/JWT and profile (implemented A3-02)
 
-Not implemented. Intended flow: validate input -> customer lookup/configured staff check -> BCrypt verification -> JWT -> filter/role checks on later requests. No authentication class or route is claimed complete.
+`controller/AuthController.java` validates registration/login/profile DTOs and calls `service/AuthService.java`. Registration normalizes email, checks uniqueness/reserved staff email, hashes the password and saves a customer. Login compares BCrypt against the customer hash or the configured staff password hash and uses JwtEncoder to issue a one-hour token. Spring Security's bearer-token filter validates signature/issuer/time and maps role claims before controller access. GET/PUT `/api/profile` derive the customer ID from the validated JWT subject and require an active account; callers cannot choose another customer ID.
 
-## Customer multi-room booking/history (planned A3-04/A3-06)
+`controller/ApiExceptionHandler.java` returns English messages, field-level validation errors and generic database conflict/unavailable responses. `AuthApiTests.java` checks BCrypt, duplicate/reserved emails, valid/invalid/expired tokens, role boundaries and profile validation. The local Postman collection checks the running application; tokens/credentials remain runtime variables.
 
-Not implemented. Intended flow: authenticated customer -> validated room/date selections -> one transactional reservation with details -> server total -> own history. JPA entities exist; business endpoints and React forms do not.
+## Booking and staff flows
 
-## Staff management and referenced-room deletion (planned A3-03/A3-05)
-
-Not implemented. Intended flow: staff authorization -> validation/search/CRUD -> check booking-detail references -> hard delete only an unused room, otherwise update status. Database FKs already block history deletion; service-level status behavior is pending.
+Planned A3-03/A3-04: staff customer/room management with history-safe deletion; transactional multi-room booking and own history. React authentication/role screens remain planned A3-05/A3-06.

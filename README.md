@@ -4,7 +4,7 @@
 
 SBA301 Assignment 03 by Phan Tuan Thanh (CE190595). Project/database name: `A3PhanTuanThanh_SE1910`, confirmed by the supplied repository and existing Spring project. The class code is SE1910.
 
-A3-01 provides the SQL Server/JPA foundation and a live React room catalog preview. Authentication, staff management and booking workflows are planned for A3-02 through A3-06.
+A3-02 includes JWT customer/staff authentication and customer profile APIs, alongside the SQL Server/JPA foundation and React catalog preview. Staff/booking APIs and role screens are planned in subsequent stages.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ spring.datasource.password=replace_with_local_database_password
 
 The default connection targets `localhost:1433`, database `A3PhanTuanThanh_SE1910`. Override `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `SERVER_ADDRESS` or `SERVER_PORT` as needed. The local SQL Server certificate is trusted by the development URL; use a trusted server certificate and `trustServerCertificate=false` outside local development.
 
-Provision a SQL login mapped only to this database. Schema creation/migration requires DDL permissions; normal execution needs read/write permissions. No database password, JWT secret or staff password is included in Git. Staff/JWT variables are placeholders for A3-02 and are not consumed yet.
+Provision a SQL login mapped only to this database. Schema creation/migration requires DDL permissions; normal execution needs read/write permissions. No database password, JWT secret or staff password is included in Git. STAFF_EMAIL, STAFF_PASSWORD and JWT_SECRET are required. Use at least 32 random bytes for JWT_SECRET and a staff password of 8 to 72 UTF-8 bytes. In ignored local properties, use app.staff.email, app.staff.password and app.jwt.secret.
 
 ## Database setup
 
@@ -76,7 +76,7 @@ npm run build --prefix frontend/A3PhanTuanThanh_SE1910
 postman collection run postman/a3-01-bootstrap.postman_collection.json --reporters cli
 ```
 
-Seven integration tests use the actual configured SQL Server, not H2. Test writes roll back; identity/sequence counters may still advance. Stop the packaged backend before `mvn clean verify` on Windows because the running JAR is locked. No staff/customer credentials are needed for A3-01.
+Seven integration tests use the actual configured SQL Server, not H2. Test writes roll back; identity/sequence counters may still advance. Stop the packaged backend before `mvn clean verify` on Windows because the running JAR is locked. Authentication configuration is required at startup; public GET requests need no token. Use scripts/start-backend.ps1 after a successful build to run an ignored copy of the JAR and avoid Windows build locks.
 
 ## Implemented endpoints
 
@@ -85,7 +85,7 @@ Seven integration tests use the actual configured SQL Server, not H2. Test write
 | GET | `/api/rooms` | Public room DTOs including room-type name and nightly price |
 | GET | `/api/room-types` | Public room-type DTOs for bootstrap verification |
 
-No mutation endpoints are exposed in A3-01. Security/JWT and user validation will be added in A3-02. The catalog preview is not the complete A3-05 public/staff UI.
+A3-02 adds public POST /api/auth/register and /api/auth/login, and customer-only GET/PUT /api/profile. Login returns token, role, name and expiresIn. Send Authorization: Bearer <token> to protected APIs. The catalog preview is not the complete A3-05 public/staff UI.
 
 ## Documentation
 

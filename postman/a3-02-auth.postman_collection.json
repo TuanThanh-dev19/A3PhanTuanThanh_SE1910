@@ -1,0 +1,386 @@
+{
+  "info": {
+    "name": "A3-02 - Authentication and profile",
+    "description": "Author: Phan Tuan Thanh - CE190595. Local requests; credentials and tokens exist only in runtime variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8081"
+    },
+    {
+      "key": "invalidToken",
+      "value": "invalid.token.value"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Author: Phan Tuan Thanh - CE190595",
+          "if (!pm.collectionVariables.get('customerEmail')) { const id = pm.variables.replaceIn('{{$guid}}'); pm.collectionVariables.set('customerEmail', 'a3pm-' + id.slice(0,20) + '@example.test'); pm.collectionVariables.set('customerPassword', 'Customer!' + id); pm.collectionVariables.set('wrongPassword', 'Wrong!' + id); }"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Public rooms",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/rooms"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Public rooms: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Seeded room catalog', () => pm.expect(pm.response.json().length).to.be.at.least(3));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Register customer: HTTP 201', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('customerId', pm.response.json().customerId);",
+              "pm.test('Safe customer DTO', () => pm.expect(pm.response.json()).not.to.have.property('password'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}, \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Duplicate email: HTTP 409', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{customerEmail}}\", \"password\": \"{{wrongPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Wrong password: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{customerEmail}}\", \"password\": \"{{customerPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Customer login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('customerToken', pm.response.json().token);",
+              "pm.test('Customer role', () => pm.expect(pm.response.json().role).to.eql('CUSTOMER'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Own profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Own profile: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.test('Own customer identity', () => pm.expect(pm.response.json().customerId).to.eql(Number(pm.collectionVariables.get('customerId'))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customerFullName\": \"Updated Postman Customer\", \"telephone\": \"0901234567\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2000-01-01\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Update profile: HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Missing token: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid token",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{invalidToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid token: HTTP 401', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer denied staff access",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/staff/customers"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Customer denied staff access: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{staffEmail}}\", \"password\": \"{{staffPassword}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff login: HTTP 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('staffToken', pm.response.json().token);",
+              "pm.test('Staff role', () => pm.expect(pm.response.json().role).to.eql('STAFF'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff denied customer profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{staffToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Staff denied customer profile: HTTP 403', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid registration",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"profile\": {\"customerFullName\": \"Postman Customer\", \"telephone\": \"bad\", \"emailAddress\": \"{{customerEmail}}\", \"customerBirthday\": \"2999-01-01\"}, \"password\": \"short\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Author: Phan Tuan Thanh - CE190595",
+              "pm.test('Invalid registration: HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

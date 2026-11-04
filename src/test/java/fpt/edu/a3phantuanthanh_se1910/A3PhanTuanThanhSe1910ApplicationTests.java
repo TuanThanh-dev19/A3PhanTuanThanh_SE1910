@@ -60,9 +60,9 @@ class A3PhanTuanThanhSe1910ApplicationTests {
     }
 
     @Test
-    void bootstrapDoesNotExposeWriteEndpoints() throws Exception {
+    void unauthenticatedWriteIsRejected() throws Exception {
         mvc.perform(post("/api/rooms").contentType("application/json").content("{}"))
-                .andExpect(status().isMethodNotAllowed());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

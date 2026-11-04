@@ -9,3 +9,5 @@
 Author headers were applied to created/modified source/config files that support comments. JSON and untouched generated Maven wrappers were not modified merely to insert a comment. Local credentials were generated into ignored application-local.properties, never placed in repository documentation/evidence. Security/JWT and later workflows are planned; no AI-generated mock data replaces backend responses.
 
 | 2026-11-04 / A3-02 | OpenAI Codex | JWT authentication, BCrypt registration, configured staff login, role authorization and own profile APIs. | Agent executed the stage-specific tests and inspected actual output/evidence. No human review is claimed. See test-matrix.md and evidence/a3-02-*. |
+
+| 2026-11-04 / A3-03 | OpenAI Codex | Staff customer/room CRUD and search, room-type lookup, referenced-room deactivation and customer-history protection. | Agent executed the stage-specific tests and inspected actual output/evidence. No human review is claimed. See test-matrix.md and evidence/a3-03-*. |

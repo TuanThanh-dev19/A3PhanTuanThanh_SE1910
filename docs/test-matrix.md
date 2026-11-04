@@ -25,10 +25,10 @@ Executed on 2026-11-04 (Asia/Bangkok). Backend tests use the real SQL Server 202
 | A02-03 | Guest/Customer | Missing/expired/invalid token and wrong role | Protected API rejects request with appropriate status | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
 | A02-04 | Staff | Login using configured staff account | STAFF JWT, no staff table | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
 | A02-05 | Customer | Read/update own profile without password disclosure | Own profile only, valid input, safe DTO | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-02-postman.txt) |
-| A03-01 | Staff | Customer and room CRUD/search, room-type selection | Persist/search real records | Not implemented | NOT RUN | - |
-| A03-02 | Guest/Customer | Attempt staff APIs | Denied | Staff APIs not implemented | NOT RUN | - |
-| A03-03 | Staff | Delete unused room versus previously booked room | Hard delete unused room; status change for referenced room | Service-level rule not implemented; only FK protection tested in A01-09 | NOT RUN | - |
-| A03-04 | Staff | Delete customer with history, invalid field values | Preserve history and reject invalid data | Service-level validation not implemented | NOT RUN | - |
+| A03-01 | Staff | Customer and room CRUD/search, room-type selection | Persist/search real records | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
+| A03-02 | Guest/Customer | Attempt staff APIs | Denied | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
+| A03-03 | Staff | Delete unused room versus previously booked room | Hard delete unused room; status change for referenced room | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
+| A03-04 | Staff | Delete customer with history, invalid field values | Preserve history and reject invalid data | Executed successfully; see stage verification below | PASS | [Stage evidence](evidence/a3-03-postman.txt) |
 | A04-01 | Customer | Create one-room and multi-room booking | One transaction, correct server total and unique ID | Booking API not implemented | NOT RUN | - |
 | A04-02 | Customer | Missing room, inactive room, invalid dates and overlap | Clear rejection without partial booking | Not implemented | NOT RUN | - |
 | A04-03 | Customer | Own history versus another customer's booking | Own records only | Not implemented | NOT RUN | - |
@@ -44,3 +44,9 @@ A01-09 verifies database history protection, not the later staff soft-delete bus
 JWT authentication, BCrypt registration, configured staff login, role authorization and own profile APIs.
 
 Backend: [actual Maven result](evidence/a3-02-backend-build.txt). API: [actual Postman result](evidence/a3-02-postman.txt). Source: [author/credential checks](evidence/a3-02-source-audit.txt).
+
+## A3-03 verification
+
+Staff customer/room CRUD and search, room-type lookup, referenced-room deactivation and customer-history protection.
+
+Backend: [actual Maven result](evidence/a3-03-backend-build.txt). API: [actual Postman result](evidence/a3-03-postman.txt). Source: [author/credential checks](evidence/a3-03-source-audit.txt).

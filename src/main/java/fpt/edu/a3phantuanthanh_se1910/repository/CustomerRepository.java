@@ -4,8 +4,10 @@ package fpt.edu.a3phantuanthanh_se1910.repository;
 import fpt.edu.a3phantuanthanh_se1910.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
+import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+    List<Customer> findByCustomerFullNameContainingIgnoreCaseOrEmailAddressContainingIgnoreCaseOrderByCustomerIdAsc(String name, String email);
     Optional<Customer> findByEmailAddressIgnoreCase(String emailAddress);
     boolean existsByEmailAddressIgnoreCase(String emailAddress);
 }

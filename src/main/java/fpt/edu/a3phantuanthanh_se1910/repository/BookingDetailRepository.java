@@ -6,4 +6,5 @@ import fpt.edu.a3phantuanthanh_se1910.entity.BookingDetailId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookingDetailRepository extends JpaRepository<BookingDetail, BookingDetailId> {
+    boolean existsByRoomRoomId(Integer roomId);
 }

@@ -28,4 +28,6 @@ All backend paths below begin at `src/main/java/fpt/edu/a3phantuanthanh_se1910/`
 
 ## Booking and staff flows
 
-Planned A3-03/A3-04: staff customer/room management with history-safe deletion; transactional multi-room booking and own history. React authentication/role screens remain planned A3-05/A3-06.
+A3-03 staff management is implemented: StaffManagementController validates DTOs and role security permits only STAFF. StaffManagementService searches repositories, applies AuthService profile/password validation and saves records. deleteRoom locks the room, calls BookingDetailRepository.existsByRoomRoomId, then deactivates referenced rooms or deletes unused rooms. deleteCustomer rejects existing reservation history. StaffManagementApiTests exercises CRUD/search/validation and actual history preservation.
+
+Transactional multi-room booking and own history remain planned A3-04. React authentication/role screens remain planned A3-05/A3-06.

@@ -1,0 +1,166 @@
+Actual local Postman CLI output. No credentials/tokens retained.
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+A3-03 - Staff management
+
+Root Public rooms
+
+  GET http://127.0.0.1:8081/api/rooms [200 OK, 941 B, 416 ms]
+  Pass  Public rooms: HTTP 200
+  Pass  Seeded room catalog
+
+Root Register customer
+
+  POST http://127.0.0.1:8081/api/auth/register [201 Created, 526 B, 344 ms]
+  Pass  Register customer: HTTP 201
+  Pass  Safe customer DTO
+
+Root Duplicate email
+
+  POST http://127.0.0.1:8081/api/auth/register [409 Conflict, 391 B, 33 ms]
+  Pass  Duplicate email: HTTP 409
+
+Root Wrong password
+
+  POST http://127.0.0.1:8081/api/auth/login [401 Unauthorized, 384 B, 91 ms]
+  Pass  Wrong password: HTTP 401
+
+Root Customer login
+
+  POST http://127.0.0.1:8081/api/auth/login [200 OK, 584 B, 141 ms]
+  Pass  Customer login: HTTP 200
+  Pass  Customer role
+
+Root Own profile
+
+  GET http://127.0.0.1:8081/api/profile [200 OK, 521 B, 37 ms]
+  Pass  Own profile: HTTP 200
+  Pass  Own customer identity
+
+Root Update profile
+
+  PUT http://127.0.0.1:8081/api/profile [200 OK, 529 B, 38 ms]
+  Pass  Update profile: HTTP 200
+
+Root Missing token
+
+  GET http://127.0.0.1:8081/api/profile [401 Unauthorized, 377 B, 5 ms]
+  Pass  Missing token: HTTP 401
+
+Root Invalid token
+
+  GET http://127.0.0.1:8081/api/profile [401 Unauthorized, 407 B, 7 ms]
+  Pass  Invalid token: HTTP 401
+
+Root Customer denied staff access
+
+  GET http://127.0.0.1:8081/api/staff/customers [403 Forbidden, 397 B, 5 ms]
+  Pass  Customer denied staff access: HTTP 403
+
+Root Staff login
+
+  POST http://127.0.0.1:8081/api/auth/login [200 OK, 570 B, 70 ms]
+  Pass  Staff login: HTTP 200
+  Pass  Staff role
+
+Root Staff denied customer profile
+
+  GET http://127.0.0.1:8081/api/profile [403 Forbidden, 397 B, 4 ms]
+  Pass  Staff denied customer profile: HTTP 403
+
+Root Invalid registration
+
+  POST http://127.0.0.1:8081/api/auth/register [400 Bad Request, 538 B, 40 ms]
+  Pass  Invalid registration: HTTP 400
+
+Root Room type options
+
+  GET http://127.0.0.1:8081/api/room-types [200 OK, 619 B, 14 ms]
+  Pass  Room type options: HTTP 200
+
+Root Create room
+
+  POST http://127.0.0.1:8081/api/staff/rooms [201 Created, 523 B, 53 ms]
+  Pass  Create room: HTTP 201
+
+Root Search room
+
+  GET http://127.0.0.1:8081/api/staff/rooms?search=PM-1793785680926 [200 OK, 525 B, 28 ms]
+  Pass  Search room: HTTP 200
+  Pass  One matching room
+
+Root Update room
+
+  PUT http://127.0.0.1:8081/api/staff/rooms/5 [200 OK, 518 B, 38 ms]
+  Pass  Update room: HTTP 200
+  Pass  Updated price
+
+Root Duplicate room number
+
+  POST http://127.0.0.1:8081/api/staff/rooms [409 Conflict, 389 B, 13 ms]
+  Pass  Duplicate room number: HTTP 409
+
+Root Invalid room
+
+  POST http://127.0.0.1:8081/api/staff/rooms [400 Bad Request, 553 B, 6 ms]
+  Pass  Invalid room: HTTP 400
+
+Root Delete unused room
+
+  DELETE http://127.0.0.1:8081/api/staff/rooms/5 [200 OK, 361 B, 41 ms]
+  Pass  Delete unused room: HTTP 200
+
+Root Deleted room is missing
+
+  GET http://127.0.0.1:8081/api/staff/rooms/5 [404 Not Found, 370 B, 13 ms]
+  Pass  Deleted room is missing: HTTP 404
+
+Root Create customer
+
+  POST http://127.0.0.1:8081/api/staff/customers [201 Created, 530 B, 81 ms]
+  Pass  Create customer: HTTP 201
+
+Root Search customer
+
+  GET http://127.0.0.1:8081/api/staff/customers?search=a3managed-1793785678508@example.test [200 OK, 527 B, 17 ms]
+  Pass  Search customer: HTTP 200
+  Pass  One matching customer
+
+Root Update customer
+
+  PUT http://127.0.0.1:8081/api/staff/customers/35 [200 OK, 525 B, 23 ms]
+  Pass  Update customer: HTTP 200
+
+Root Delete unused customer
+
+  DELETE http://127.0.0.1:8081/api/staff/customers/35 [204 No Content, 282 B, 24 ms]
+  Pass  Delete unused customer: HTTP 204
+
+Root Customer is missing
+
+  GET http://127.0.0.1:8081/api/staff/customers/35 [404 Not Found, 374 B, 11 ms]
+  Pass  Customer is missing: HTTP 404
+
+----------------------------------------------------------------------
+|                         |            executed |             failed |
+--------------------------+---------------------+---------------------
+|              iterations |                   1 |                  0 |
+--------------------------+---------------------+---------------------
+|                requests |                  26 |                  0 |
+--------------------------+---------------------+---------------------
+|            test-scripts |                  26 |                  0 |
+--------------------------+---------------------+---------------------
+|      prerequest-scripts |                  26 |                  0 |
+--------------------------+---------------------+---------------------
+|              assertions |                  34 |                  0 |
+----------------------------------------------------------------------
+| total run duration: 3.8 s                                          |
+----------------------------------------------------------------------
+| total data received: 3.92 KB (approx)                              |
+----------------------------------------------------------------------
+| average response time: 61 ms [min: 4 ms, max: 416 ms, s.d.: 97 ms] |
+----------------------------------------------------------------------

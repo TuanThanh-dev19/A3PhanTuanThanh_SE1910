@@ -40,8 +40,14 @@ Planned APIs: customer registration/login, own profile/history/bookings, staff c
 
 `config/SecurityConfig.java` uses Spring Security's BearerTokenAuthenticationFilter with Nimbus HS256 validation, issuer `fuminihotel`, expiration checking and stateless sessions. JWT subject is the customer ID or `staff`; the `role` claim maps to `ROLE_CUSTOMER`/`ROLE_STAFF`. Tokens expire after one hour. Keys and configured staff credentials come from environment/ignored local properties. Staff password is BCrypt-encoded in memory; customer passwords are BCrypt hashes in SQL Server.
 
-Public: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/rooms`, GET `/api/room-types`. Customer only: GET/PUT `/api/profile`. Staff path `/api/staff/**` is reserved for STAFF. Other routes are denied. No staff/customer mutation APIs beyond profile exist yet.
+Public: POST `/api/auth/register`, POST `/api/auth/login`, GET `/api/rooms`, GET `/api/room-types`. Customer only: GET/PUT `/api/profile`. Staff path `/api/staff/**` is reserved for STAFF. Other routes are denied. Staff customer/room APIs were added in A3-03 (see below).
 
 Registration body: `{profile: {customerFullName, telephone, emailAddress, customerBirthday}, password}`. Login body: `{email, password}`. DTO validation enforces lengths, email, past birthday and telephone shape. Passwords require 8-64 characters and at most 72 UTF-8 bytes. Duplicate/reserved emails return 409. Validation returns 400 plus fieldErrors; absent/invalid token returns 401, wrong role 403. Profile DTOs exclude passwords.
 
-Staff CRUD/history-safe service behavior remains planned for A3-03; booking transactions/overlap checks remain planned for A3-04. The existing FKs already prevent cascade loss.
+Booking transactions/overlap checks remain planned for A3-04. The existing FKs already prevent cascade loss.
+
+## Staff management (implemented A3-03)
+
+`StaffManagementController` -> `StaffManagementService` -> repositories. STAFF can GET/list/search, POST, PUT and DELETE `/api/staff/customers` and `/api/staff/rooms` (item operations use `/{id}`). Lists accept `?search=` (maximum 100 characters). Customer search matches name/email; room search matches number/description. GET `/api/room-types` supplies options.
+
+Staff customer bodies contain validated `profile`, `customerStatus` (1 active/2 inactive), and a password required on create, optional on update. DTOs never include password hashes. Referenced customers cannot be deleted (409); staff can deactivate them. Room bodies validate number/description/capacity/type/status/positive money up to 1,000,000,000 with at most four decimal places. Room numbers are checked for duplicates in the service. Room writes/deletion acquire a pessimistic row lock. A referenced room is deactivated (status 2) by DELETE; an unused room is physically deleted. Foreign keys remain a second history safeguard.

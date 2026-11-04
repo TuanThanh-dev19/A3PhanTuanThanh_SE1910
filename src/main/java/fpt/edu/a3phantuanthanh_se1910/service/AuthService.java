@@ -1,7 +1,11 @@
 // Author: Phan Tuan Thanh - CE190595
 package fpt.edu.a3phantuanthanh_se1910.service;
 
-import fpt.edu.a3phantuanthanh_se1910.dto.*;
+import fpt.edu.a3phantuanthanh_se1910.dto.respone.AuthResponse;
+import fpt.edu.a3phantuanthanh_se1910.dto.respone.CustomerResponse;
+import fpt.edu.a3phantuanthanh_se1910.dto.request.LoginRequest;
+import fpt.edu.a3phantuanthanh_se1910.dto.request.ProfileRequest;
+import fpt.edu.a3phantuanthanh_se1910.dto.request.RegisterRequest;
 import fpt.edu.a3phantuanthanh_se1910.entity.Customer;
 import fpt.edu.a3phantuanthanh_se1910.exception.ApiException;
 import fpt.edu.a3phantuanthanh_se1910.repository.CustomerRepository;

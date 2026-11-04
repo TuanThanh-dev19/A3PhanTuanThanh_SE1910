@@ -29,6 +29,8 @@ Script 01 creates the database; script 02 preserves the original schema under it
 
 ## Authentication and API contracts
 
+DTOs are grouped by direction: `dto.request` contains the nine request records, and `dto.respone` contains the six response records. The `respone` package name follows the requested folder name. Controllers, services and tests import the corresponding records; JSON field names and validation rules are unchanged.
+
 SecurityConfig uses Spring Security's BearerTokenAuthenticationFilter and Nimbus HS256 encoder/decoder, issuer fuminihotel, expiry validation and stateless sessions. AuthService checks BCrypt customer hashes or the configured staff password hash and issues a one-hour JWT. Subject is customer ID or staff; role maps to ROLE_CUSTOMER/ROLE_STAFF. Staff credentials/signing key come from configuration, never a Staff table. Customer services recheck active account status.
 
 Public GET /api/rooms, /api/room-types and POST /api/auth/register, /api/auth/login. Customer-only GET/PUT /api/profile, GET/POST /api/bookings, GET /api/bookings/{id}. Staff CRUD/search routes are /api/staff/customers, /api/staff/rooms, /api/staff/bookings, with item /{id} and booking PATCH /{id}/status. See [README](../README.md) for methods/bodies.

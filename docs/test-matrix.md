@@ -31,4 +31,8 @@ Final checks executed on 2026-11-04, Asia/Bangkok. The resumed final run verifie
 | AUDIT-01 | Developer | Headers, JSON, docs links, secrets/generated output | Valid headers/JSON/links; no local credentials in Git candidates | 76 source/config headers checked; JSON/links valid; credential/pattern and ignore checks passed | PASS | [Source audit](evidence/a3-07-source-audit.txt) |
 | GIT-01 | Developer | A3-07 commit/push, remote SHA, clean tree | Normal push and clean tree | Implementation 6f11ca0 pushed; remote SHA matched and tree was clean; completion docs record that SHA | PASS | [Git closure](evidence/a3-07-git-closure.txt), [stage commits](development-plan.md) |
 
+## DTO package refactor verification
+
+After moving nine request DTOs to `dto.request` and six response DTOs to `dto.respone`, `mvn -B clean verify` passed all 29 backend tests with no failures, errors or skipped tests. Clean compilation used the new packages, and source comparison confirmed that only package declarations and DTO imports changed in the affected Java files. See the [actual build output](evidence/dto-package-refactor-tests.txt).
+
 Initial-stage evidence remains historical: A3-01 rejected unsupported POST with 405 before security, while the final unauthenticated-write regression expects 401. PASS refers to each executed scenario/evidence, not every possible input or production-load condition. Text evidence is actual command output or an explicit browser-action record; screenshots/results are not fabricated.

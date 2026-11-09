@@ -4,8 +4,10 @@ import { api, errorMessage } from '../api.js';
 import { useAuth } from '../AuthContext.jsx';
 import ProfileFields from '../components/ProfileFields.jsx';
 import Notice from '../components/Notice.jsx';
+import Modal from '../components/Modal.jsx';
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [draft, setDraft] = useState(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -34,9 +36,10 @@ export default function ProfilePage() {
     setMessage('');
     setBusy(true);
     try {
-      const { data } = await api.put('/profile', profile);
+      const { data } = await api.put('/profile', draft);
       setProfile(fields(data));
       updateName(data.customerFullName);
+      setDraft(null);
       setMessage('Profile updated.');
     } catch (failure) {
       setError(errorMessage(failure));
@@ -46,14 +49,70 @@ export default function ProfilePage() {
   }
   return (
     <section>
-      <h1>My profile</h1>
-      <Notice error={error} message={message} />
+      <div className="catalog-heading">
+        <h1>My profile</h1>
+        {profile && (
+          <button
+            onClick={() => {
+              setDraft({ ...profile });
+              setError('');
+              setMessage('');
+            }}
+          >
+            Edit profile
+          </button>
+        )}
+      </div>
+      <Notice error={!draft ? error : ''} message={message} />
       {!profile && !error && <p role="status">Loading profile...</p>}
       {profile && (
-        <form className="panel" onSubmit={save}>
-          <ProfileFields value={profile} onChange={setProfile} />
-          <button disabled={busy}>{busy ? 'Saving...' : 'Save profile'}</button>
-        </form>
+        <dl className="panel form-grid profile-summary">
+          <div>
+            <dt>Full name</dt>
+            <dd>{profile.customerFullName}</dd>
+          </div>
+          <div>
+            <dt>Telephone</dt>
+            <dd>{profile.telephone}</dd>
+          </div>
+          <div>
+            <dt>Email address</dt>
+            <dd>{profile.emailAddress}</dd>
+          </div>
+          <div>
+            <dt>Birthday</dt>
+            <dd>{profile.customerBirthday}</dd>
+          </div>
+        </dl>
+      )}
+      {draft && (
+        <Modal
+          title="Edit profile"
+          busy={busy}
+          onClose={() => {
+            setDraft(null);
+            setError('');
+          }}
+        >
+          <Notice error={error} />
+          <form onSubmit={save}>
+            <ProfileFields value={draft} onChange={setDraft} disabled={busy} />
+            <div className="actions">
+              <button disabled={busy}>{busy ? 'Saving...' : 'Save profile'}</button>
+              <button
+                type="button"
+                className="secondary"
+                disabled={busy}
+                onClick={() => {
+                  setDraft(null);
+                  setError('');
+                }}
+              >
+                Cancel editing
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
     </section>
   );
